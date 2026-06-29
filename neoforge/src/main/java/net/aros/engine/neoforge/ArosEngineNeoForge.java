@@ -1,6 +1,6 @@
 package net.aros.engine.neoforge;
 
-import net.aros.engine.ArosEngine;
+import net.aros.engine.common.ArosEngine;
 import net.neoforged.fml.common.Mod;
 
 @Mod(ArosEngine.MOD_ID)
