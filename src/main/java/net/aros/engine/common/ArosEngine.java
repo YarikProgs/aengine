@@ -6,18 +6,20 @@ import net.aros.engine.common.init.AEngineValueTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+@Mod(ArosEngine.MOD_ID)
 public final class ArosEngine {
     public static final String MOD_ID = "aengine";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     private static CommonEngine engine;
 
-    public static void init() {
+    public ArosEngine() {
         LOGGER.info("Aros' Engine is initializing...");
 
         AEngineRegistries.touch();
