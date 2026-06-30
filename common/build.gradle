@@ -2,11 +2,20 @@ architectury {
     common rootProject.enabled_platforms.split(',')
 }
 
+repositories {
+    maven {
+        name = "FirstDark"
+        url = uri("https://maven.firstdark.dev/snapshots")
+    }
+}
+
 dependencies {
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
     // Do NOT use other classes from Fabric Loader.
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    modImplementation "com.lowdragmc.ldlib2:ldlib2-neoforge-${rootProject.minecraft_version}:${rootProject.ldlib2_version}:all"
 
     modCompileOnly "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version+$rootProject.minecraft_version"
 }

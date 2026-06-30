@@ -40,6 +40,9 @@ dependencies {
 
     modImplementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:$rootProject.fabric_api_version+$rootProject.ffa_version+$rootProject.minecraft_version"
 
+    minecraftRuntimeLibraries "org.appliedenergistics.yoga:yoga:${rootProject.yoga_version}"
+    minecraftRuntimeLibraries "dev.vfyjxf:taffy:${rootProject.taffy_version}"
+
     common(project(path: ':common', configuration: 'namedElements')) { transitive = false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 }
