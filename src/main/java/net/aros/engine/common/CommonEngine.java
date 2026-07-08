@@ -1,29 +1,29 @@
 package net.aros.engine.common;
 
-import net.aros.engine.common.storage.storage.AbstractStorage;
-import net.aros.engine.common.storage.storage.StorageAccess;
-import net.aros.engine.common.storage.storage.StorageKey;
-import net.aros.engine.common.storage.value.ValueAccess;
-import net.aros.engine.common.systems.StorageSystem;
-import net.aros.engine.common.systems.ServerTickSystem;
+import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
+import net.aros.engine.common.api.storage.storage.AbstractStorage;
+import net.aros.engine.common.api.storage.value.ValueAccess;
+import net.aros.engine.common.internal.managers.StorageManager;
+import net.aros.engine.common.internal.systems.CustomStorageSystem;
+import net.aros.engine.common.internal.systems.ServerTickSystem;
 import net.aros.engine.server.StorageSavedData;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CommonEngine {
+    private final StorageManager storageManager = new StorageManager(map -> {
+        if (ServerLifecycleHooks.getCurrentServer() != null)
+            RPCPacketDistributor.rpcToAllPlayers("setServerStoragesMetadata", map);
+    });
     private final List<ServerTickSystem> tickSystems = new ArrayList<>();
-
-    private final Map<StorageKey<?>, AbstractStorage<?>> storages = new HashMap<>();
-    private final StorageAccess storageAccess = StorageAccess.wrap(storages);
     private ValueAccess valueAccess;
 
     public void initialize() {
@@ -35,8 +35,8 @@ public class CommonEngine {
         if (system instanceof ServerTickSystem tickSystem) {
             tickSystems.add(tickSystem);
         }
-        if (system instanceof StorageSystem storageSystem) {
-            registerStoragesFrom(storageSystem);
+        if (system instanceof CustomStorageSystem customStorageSystem) {
+            registerStoragesFrom(customStorageSystem);
         }
     }
 
@@ -45,18 +45,19 @@ public class CommonEngine {
     }
 
     public void serverTick(MinecraftServer server) {
-        var ctx = new ServerTickSystem.Context(server, valueAccess, storageAccess);
+        var ctx = new ServerTickSystem.Context(server, valueAccess, storageManager().storageAccess());
         for (ServerTickSystem tickSystem : tickSystems) {
             tickSystem.tick(ctx);
         }
     }
 
-    private void registerStoragesFrom(@NotNull StorageSystem storageSystem) {
-        var ctx = new StorageSystem.Context();
-        storageSystem.onStorageRegistration(ctx);
+    private void registerStoragesFrom(@NotNull CustomStorageSystem customStorageSystem) {
+        var ctx = new CustomStorageSystem.Context();
+        customStorageSystem.onStorageRegistration(ctx);
 
-        storages.putAll(ctx.getRegisteredStorages());
+        storageManager().putAll(ctx.getRegisteredStorages());
         for (AbstractStorage<?> storage : ctx.getRegisteredStorages().values()) {
+            storage.setMetadataDestination(storageManager::setMetadata);
             ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(storage.getReloadListener());
         }
     }
@@ -64,5 +65,9 @@ public class CommonEngine {
     public ValueAccess values() {
         if (valueAccess == null) throw new IllegalStateException("Called values too early");
         return valueAccess;
+    }
+
+    public StorageManager storageManager() {
+        return storageManager;
     }
 }

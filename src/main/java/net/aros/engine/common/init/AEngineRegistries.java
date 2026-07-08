@@ -1,7 +1,7 @@
 package net.aros.engine.common.init;
 
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.storage.value.ValueType;
+import net.aros.engine.common.api.storage.value.ValueType;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

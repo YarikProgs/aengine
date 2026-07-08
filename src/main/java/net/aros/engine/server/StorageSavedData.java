@@ -2,8 +2,8 @@ package net.aros.engine.server;
 
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.storage.value.Value;
-import net.aros.engine.common.storage.value.ValueType;
+import net.aros.engine.common.api.storage.value.Value;
+import net.aros.engine.common.api.storage.value.ValueType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;

@@ -1,6 +1,6 @@
 package net.aros.engine.client.systems;
 
-import net.aros.engine.common.storage.storage.StorageAccess;
+import net.aros.engine.common.api.storage.storage.StorageAccess;
 import net.minecraft.client.Minecraft;
 
 public interface ClientTickSystem {

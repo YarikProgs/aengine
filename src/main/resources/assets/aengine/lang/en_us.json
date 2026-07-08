@@ -1,0 +1,20 @@
+{
+  "view.aengine.storages": "Storages",
+  "view.aengine.content": "Content",
+  "view.aengine.loaders": "Loaders",
+  "text.aengine.client": "Client",
+  "text.aengine.server": "Server",
+  "text.aengine.no_storage": "Nobody here but us chickens!",
+  "text.aengine.storage": "Storage: %s",
+  "text.aengine.status": "Status: ",
+  "text.aengine.load_time": "Load time: ",
+  "text.aengine.entries": "Entries: ",
+  "text.aengine.name": "Name",
+  "text.aengine.path": "Path",
+  "load_status.aengine.ok": "OK",
+  "load_status.aengine.fail": "Fail",
+  "load_status.aengine.reloading": "Reloading...",
+
+
+  "storage.aengine.txt": "TXTs"
+}

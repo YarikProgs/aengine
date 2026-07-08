@@ -3,6 +3,7 @@ package net.aros.engine.common;
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.init.AEngineRegistries;
 import net.aros.engine.common.init.AEngineValueTypes;
+import net.aros.examples.common.ArosEngineExamples;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +28,11 @@ public final class ArosEngine {
 
         engine = new CommonEngine();
         engine.initialize();
+
+        //noinspection ConstantValue TODO replace with config entry
+        if (true) {
+            new ArosEngineExamples();
+        }
     }
 
     @Contract("_ -> new")

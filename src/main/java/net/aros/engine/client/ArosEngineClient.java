@@ -1,8 +1,10 @@
 package net.aros.engine.client;
 
-import net.aros.engine.client.dialogue.StorageClientSystem;
+import net.aros.engine.client.init.CustomLdlibTypes;
 import net.aros.engine.client.keybind.AEngineKeyBinds;
+import net.aros.engine.client.modules.StorageClientModule;
 import net.aros.engine.common.ArosEngine;
+import net.aros.examples.client.ArosEngineClientExamples;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.Mod;
 
@@ -12,11 +14,16 @@ public final class ArosEngineClient {
 
     public ArosEngineClient() {
         AEngineKeyBinds.init();
+        CustomLdlibTypes.init();
 
         engine = new ClientEngine();
         engine.initializeClient();
+        engine.register(new StorageClientModule());
 
-        engine.register(new StorageClientSystem());
+        //noinspection ConstantValue TODO replace with config entry
+        if (true) {
+            new ArosEngineClientExamples();
+        }
     }
 
     public static ClientEngine getEngine() {
