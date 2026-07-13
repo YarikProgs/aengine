@@ -6,15 +6,15 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Function;
 
-public class ScreenModuleUiProvider implements ModuleUiProvider {
+public class ScreenProvider implements ModuleUIProvider {
     private final Function<Player, Screen> factory;
 
-    public ScreenModuleUiProvider(Function<Player, Screen> factory) {
+    public ScreenProvider(Function<Player, Screen> factory) {
         this.factory = factory;
     }
 
     @Override
-    public void openUi(Player player) {
+    public void openUI(Player player) {
         Screen screen = factory.apply(player);
         if (screen == null) return;
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));

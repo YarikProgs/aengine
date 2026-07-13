@@ -2,6 +2,7 @@ package net.aros.engine.client.gui.ui.elements;
 
 import com.lowdragmc.lowdraglib2.gui.util.ITreeNode;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +27,7 @@ public final class StorageTreeNode implements ITreeNode<String, StorageKey<?>> {
     @Nullable
     private Predicate<StorageTreeNode> valid;
     private boolean isClient;
+    private LoadStatus loadStatus;
 
     public StorageTreeNode(String key) {
         this(null, 0, key);
@@ -108,23 +110,6 @@ public final class StorageTreeNode implements ITreeNode<String, StorageKey<?>> {
         return this;
     }
 
-    public void removeChild(String key) {
-        if (children != null) {
-            for (StorageTreeNode child : children) {
-                if (areKeysEqual(child.key, key)) {
-                    children.remove(child);
-                    return;
-                }
-            }
-        }
-    }
-
-    public void removeChild(StorageTreeNode child) {
-        if (children != null) {
-            children.remove(child);
-        }
-    }
-
     public boolean areKeysEqual(String key1, String key2) {
         return Objects.equals(key1, key2);
     }
@@ -160,5 +145,13 @@ public final class StorageTreeNode implements ITreeNode<String, StorageKey<?>> {
 
     public boolean isClient() {
         return isClient;
+    }
+
+    public void setStatus(LoadStatus loadStatus) {
+        this.loadStatus = loadStatus;
+    }
+
+    public LoadStatus loadStatus() {
+        return loadStatus;
     }
 }

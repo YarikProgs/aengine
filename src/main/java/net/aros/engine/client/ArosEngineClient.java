@@ -1,7 +1,7 @@
 package net.aros.engine.client;
 
-import net.aros.engine.client.init.CustomLdlibTypes;
-import net.aros.engine.client.keybind.AEngineKeyBinds;
+import net.aros.engine.client.init.AeLdlibTypes;
+import net.aros.engine.client.init.AeKeybinds;
 import net.aros.engine.client.modules.StorageClientModule;
 import net.aros.engine.common.ArosEngine;
 import net.aros.examples.client.ArosEngineClientExamples;
@@ -13,8 +13,8 @@ public final class ArosEngineClient {
     private static ClientEngine engine;
 
     public ArosEngineClient() {
-        AEngineKeyBinds.init();
-        CustomLdlibTypes.init();
+        AeKeybinds.init();
+        AeLdlibTypes.init();
 
         engine = new ClientEngine();
         engine.initializeClient();

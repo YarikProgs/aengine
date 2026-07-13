@@ -8,15 +8,15 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Function;
 
-public class ModularUiModuleUiProvider implements ModuleUiProvider {
+public class ModularUIProvider implements ModuleUIProvider {
     private final Function<Player, ModularUI> factory;
 
-    public ModularUiModuleUiProvider(Function<Player, ModularUI> factory) {
+    public ModularUIProvider(Function<Player, ModularUI> factory) {
         this.factory = factory;
     }
 
     @Override
-    public void openUi(Player player) {
+    public void openUI(Player player) {
         Minecraft.getInstance().setScreen(new ModularUIScreen(factory.apply(player), Component.empty()));
     }
 }

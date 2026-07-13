@@ -4,27 +4,30 @@ import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public record StorageMetadata(List<LoaderMetadata> loadersMetadata) {
-    public static final Codec<StorageMetadata> CODEC = LoaderMetadata.CODEC.listOf().xmap(StorageMetadata::new, StorageMetadata::loadersMetadata);
+public record StorageMetadata(Map<ResourceLocation, LoaderMetadata> loadersMetadata) {
+    public static final Codec<StorageMetadata> CODEC = Codec.unboundedMap(ResourceLocation.CODEC, LoaderMetadata.CODEC)
+            .xmap(StorageMetadata::new, StorageMetadata::loadersMetadata);
+
     public static final StreamCodec<RegistryFriendlyByteBuf, StorageMetadata> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.collection(ArrayList::new, LoaderMetadata.STREAM_CODEC), StorageMetadata::loadersMetadata,
+            ByteBufCodecs.map(HashMap::new, ResourceLocation.STREAM_CODEC, LoaderMetadata.STREAM_CODEC), StorageMetadata::loadersMetadata,
             StorageMetadata::new
     );
 
     public long lastLoadTimeMs() {
         long loadTimeMs = 0;
-        for (LoaderMetadata loaderMetadata : loadersMetadata) {
+        for (LoaderMetadata loaderMetadata : loadersMetadata.values()) {
             loadTimeMs += loaderMetadata.lastLoadTimeMs();
         }
         return loadTimeMs;
     }
 
     public LoadStatus loadStatus() {
-        for (LoaderMetadata loaderMetadata : loadersMetadata) {
+        for (LoaderMetadata loaderMetadata : loadersMetadata.values()) {
             if (loaderMetadata.loadStatus() != LoadStatus.OK)
                 return loaderMetadata.loadStatus();
         }

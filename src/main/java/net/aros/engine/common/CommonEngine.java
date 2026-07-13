@@ -1,28 +1,23 @@
 package net.aros.engine.common;
 
-import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import net.aros.engine.common.api.storage.storage.AbstractStorage;
 import net.aros.engine.common.api.storage.value.ValueAccess;
-import net.aros.engine.common.internal.managers.StorageManager;
-import net.aros.engine.common.internal.systems.CustomStorageSystem;
-import net.aros.engine.common.internal.systems.ServerTickSystem;
+import net.aros.engine.common.storage.StorageManager;
+import net.aros.engine.common.systems.CustomStorageSystem;
+import net.aros.engine.common.systems.ServerTickSystem;
 import net.aros.engine.server.StorageSavedData;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommonEngine {
-    private final StorageManager storageManager = new StorageManager(map -> {
-        if (ServerLifecycleHooks.getCurrentServer() != null)
-            RPCPacketDistributor.rpcToAllPlayers("setServerStoragesMetadata", map);
-    });
+    private final StorageManager storageManager = new StorageManager();
     private final List<ServerTickSystem> tickSystems = new ArrayList<>();
     private ValueAccess valueAccess;
 
@@ -57,8 +52,7 @@ public class CommonEngine {
 
         storageManager().putAll(ctx.getRegisteredStorages());
         for (AbstractStorage<?> storage : ctx.getRegisteredStorages().values()) {
-            storage.setMetadataDestination(storageManager::setMetadata);
-            ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(storage.getReloadListener());
+            ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(storage.createReloadListener());
         }
     }
 

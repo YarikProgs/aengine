@@ -22,12 +22,12 @@ public abstract class AbstractResourceLoader<T> {
 
     private final String path;
     private final String fileExtension;
-    private final ResourceLocation loaderKey;
+    private final ResourceLocation key;
     private KeyFunction<T> keyFactory;
     private volatile LoaderMetadata metadata;
 
     public AbstractResourceLoader(ResourceLocation key, String path, String fileExtension) {
-        this.loaderKey = key;
+        this.key = key;
         this.path = path;
         this.fileExtension = fileExtension;
         this.keyFactory = (pathKey, element) -> getKeyFromPath(pathKey);
@@ -38,7 +38,7 @@ public abstract class AbstractResourceLoader<T> {
     @Contract("_ -> new")
     public final @NotNull CompletableFuture<Map<ResourceLocation, T>> parseAll(@NotNull ResourceManager manager) {
         return CompletableFuture.supplyAsync(() -> {
-            metadata = new LoaderMetadata(loaderKey, -1, LoadStatus.RELOADING);
+            metadata = new LoaderMetadata(-1, LoadStatus.RELOADING);
 
             LoadStatus[] status = { LoadStatus.OK };
             Map<ResourceLocation, T> parsed = new HashMap<>();
@@ -50,14 +50,14 @@ public abstract class AbstractResourceLoader<T> {
                 var result = tryParse(path, resource);
                 if (result.isError()) {
                     status[0] = LoadStatus.FAIL;
-                    LOGGER.warn("({}) Failed to load element '{}': {}", getClass(), path, result.error().orElseThrow().message());
+                    LOGGER.warn("({}) Failed to load element '{}': {}", key, path, result.error().orElseThrow().message());
                     return;
                 }
                 var value = result.getOrThrow();
                 parsed.put(keyFactory.getKeyOf(path, value), value);
             });
 
-            metadata = new LoaderMetadata(loaderKey, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime), status[0]);
+            metadata = new LoaderMetadata(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime), status[0]);
 
             return parsed;
         });
@@ -67,7 +67,7 @@ public abstract class AbstractResourceLoader<T> {
         try {
             return parse(pathKey, resource);
         } catch (Exception e) {
-            return DataResult.error(() -> "(%s): Failed to parse value '%s': %s: %s".formatted(getClass().getName(), pathKey, e.getClass().getName(), e.getMessage()));
+            return DataResult.error(() -> "(%s): Failed to parse value '%s': %s: %s".formatted(key, pathKey, e.getClass().getName(), e.getMessage()));
         }
     }
 
@@ -78,6 +78,10 @@ public abstract class AbstractResourceLoader<T> {
 
     protected final void setKeyFactory(KeyFunction<T> keyFactory) {
         this.keyFactory = Objects.requireNonNull(keyFactory);
+    }
+
+    public final ResourceLocation key() {
+        return key;
     }
 
     public final LoaderMetadata getMetadata() {

@@ -54,7 +54,7 @@ public class EngineScreen extends Screen {
                     location.withPrefix("widget/").withSuffix("_selected")
             ), () -> {
                 if (minecraft == null) return;
-                provider.openUi(minecraft.player);
+                provider.openUI(minecraft.player);
             });
         });
 

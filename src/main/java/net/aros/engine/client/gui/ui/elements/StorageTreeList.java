@@ -8,13 +8,17 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.TextElement;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.TreeList;
 import com.lowdragmc.lowdraglib2.gui.ui.utils.UIElementProvider;
 import dev.vfyjxf.taffy.style.FlexDirection;
+import net.aros.engine.client.gui.util.AeColors;
+import net.aros.engine.client.gui.util.AeIcons;
 import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadataMap;
+import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class StorageTreeList extends TreeList<StorageTreeNode> {
     private final StorageTreeNode storages = new StorageTreeNode("Storages");
@@ -27,23 +31,23 @@ public class StorageTreeList extends TreeList<StorageTreeNode> {
         setClickToExpand(true);
     }
 
-    public void setServerData(StorageMetadataMap metadataMap) {
+    public void setServerData(Map<StorageKey<?>, StorageMetadata> metadataMap) {
         addDataInto(server, metadataMap);
     }
 
-    public void setClientData(StorageMetadataMap metadataMap) {
+    public void setClientData(Map<StorageKey<?>, StorageMetadata> metadataMap) {
         addDataInto(client, metadataMap);
     }
 
-    private void addDataInto(StorageTreeNode node, StorageMetadataMap metadataMap) {
+    private void addDataInto(StorageTreeNode node, Map<StorageKey<?>, StorageMetadata> metadataMap) {
         node.clearChildren();
         addNodesInto(node, metadataMap);
         reloadList();
         expandAllNodesIf(storages, node_ -> !node_.getChildren().isEmpty());
     }
 
-    private void addNodesInto(StorageTreeNode node, StorageMetadataMap serverMap) {
-        List<StorageKey<?>> list = new ArrayList<>(serverMap.values().keySet());
+    private void addNodesInto(StorageTreeNode node, Map<StorageKey<?>, StorageMetadata> map) {
+        List<StorageKey<?>> list = new ArrayList<>(map.keySet());
         list.sort(StorageKey::compareTo);
         for (var key : list) {
             String path = key.key().getPath();
@@ -53,8 +57,10 @@ public class StorageTreeList extends TreeList<StorageTreeNode> {
                 current = current.getOrCreateChild(part);
             }
             current.setContent(key);
-            if (current.parent != null)
+            if (current.parent != null) {
                 current.setClient(current.parent.isClient());
+                current.setStatus(map.get(key).loadStatus());
+            }
         }
     }
 
@@ -80,7 +86,13 @@ public class StorageTreeList extends TreeList<StorageTreeNode> {
             var statusIcon = new UIElement().layout(layout -> {
                 layout.setAspectRatio(1);
                 layout.heightPercent(100);
-            }).style(style -> style.backgroundTexture(Icons.ADD));
+            }).style(style -> {
+                LoadStatus status = node.loadStatus();
+                if (status != null) {
+                    style.backgroundTexture(AeIcons.getIconForLoadStatus(status));
+                    style.color(AeColors.getStatusColor(status));
+                }
+            });
 
             container.addChild(icon);
             container.addChild(label);

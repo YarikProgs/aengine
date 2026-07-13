@@ -1,4 +1,4 @@
-package net.aros.engine.common.internal.systems;
+package net.aros.engine.common.systems;
 
 import net.aros.engine.common.api.storage.storage.AbstractStorage;
 import net.aros.engine.common.api.storage.storage.StorageKey;

@@ -1,8 +1,8 @@
 package net.aros.engine.common;
 
 import com.mojang.logging.LogUtils;
-import net.aros.engine.common.init.AEngineRegistries;
-import net.aros.engine.common.init.AEngineValueTypes;
+import net.aros.engine.common.init.AeRegistries;
+import net.aros.engine.common.init.AeValueTypes;
 import net.aros.examples.common.ArosEngineExamples;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -23,8 +23,8 @@ public final class ArosEngine {
     public ArosEngine() {
         LOGGER.info("Aros' Engine is initializing...");
 
-        AEngineRegistries.touch();
-        AEngineValueTypes.touch();
+        AeRegistries.touch();
+        AeValueTypes.touch();
 
         engine = new CommonEngine();
         engine.initialize();
