@@ -130,7 +130,8 @@ public final class StorageTreeNode implements ITreeNode<String, StorageKey<?>> {
         StorageTreeNode that = (StorageTreeNode) o;
         return dimension == that.dimension &&
                 areKeysEqual(key, that.key) &&
-                areContentsEqual(content, that.content);
+                areContentsEqual(content, that.content) &&
+                isClient == that.isClient;
     }
 
     @Override

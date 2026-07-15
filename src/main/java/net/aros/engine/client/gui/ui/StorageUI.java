@@ -2,28 +2,27 @@ package net.aros.engine.client.gui.ui;
 
 import com.lowdragmc.lowdraglib2.editor.ui.SplittableWindow;
 import com.lowdragmc.lowdraglib2.editor.ui.View;
-import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import com.lowdragmc.lowdraglib2.gui.texture.Icons;
 import com.lowdragmc.lowdraglib2.gui.texture.SpriteTexture;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
+import com.lowdragmc.lowdraglib2.gui.ui.elements.BindableValue;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Button;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
+import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.gui.ui.style.StylesheetManager;
 import com.lowdragmc.lowdraglib2.gui.ui.styletemplate.OreSprites;
-import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
-import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
-import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import com.mojang.logging.LogUtils;
 import dev.vfyjxf.taffy.style.AlignItems;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.client.gui.ui.elements.LoadersViewer;
 import net.aros.engine.client.gui.ui.elements.StorageTreeList;
 import net.aros.engine.client.gui.ui.elements.StorageViewer;
+import net.aros.engine.client.gui.util.StorageDependentUIElement;
+import net.aros.engine.client.session.ClientStorageUISession;
 import net.aros.engine.common.api.storage.storage.StorageKey;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.minecraft.client.Minecraft;
 import org.appliedenergistics.yoga.YogaEdge;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,15 +33,18 @@ import java.util.Map;
 
 import static net.aros.engine.common.ArosEngine.translation;
 
-public class StorageEditor extends UIElement {
+public class StorageUI extends UIElement {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private final Map<StorageKey<?>, StorageMetadata> serverStoragesMetadata = new HashMap<>();
+    private final Map<StorageKey<?>, StorageMetadata> clientStoragesMetadata = new HashMap<>();
 
     public final SplittableWindow rootWindow;
     public SplittableWindow leftWindow, centerWindow;
 
     public final StorageTreeList storageTreeList = new StorageTreeList();
-    public final StorageViewer storageViewer = new StorageViewer();
-    public final LoadersViewer loadersViewer = new LoadersViewer();
+    public final StorageDependentUIElement storageViewer = new StorageViewer(serverStoragesMetadata, clientStoragesMetadata);
+    public final StorageDependentUIElement loadersViewer = new LoadersViewer(serverStoragesMetadata, clientStoragesMetadata);
 
     public final UIElement top = new UIElement();
     public final UIElement icon = new UIElement();
@@ -51,11 +53,10 @@ public class StorageEditor extends UIElement {
     public final UIElement buttonContainer = new UIElement();
     public final Button closeButton = new Button();
 
-    private final Map<StorageKey<?>, StorageMetadata> serverStoragesMetadata = new HashMap<>();
-    private final Map<StorageKey<?>, StorageMetadata> clientStoragesMetadata = new HashMap<>();
-
-    public StorageEditor() {
-        RPCPacketDistributor.rpcToServer("storageEditorSession$create");
+    public StorageUI() {
+        addEventListener(UIEvents.MUI_CHANGED, e -> {
+            ClientStorageUISession.createBoth();
+        });
         getLayout().widthPercent(100).heightPercent(100);
 
         rootWindow = new SplittableWindow().setImmortal(true).setAnchorId("root");
@@ -111,9 +112,11 @@ public class StorageEditor extends UIElement {
 
         closeButton.setOnClick(e -> {
             if (getModularUI() != null && getModularUI().getScreen() != null) {
-                RPCPacketDistributor.rpcToServer("storageEditorSession$remove");
                 getModularUI().getScreen().onClose();
             }
+        });
+        addEventListener(UIEvents.REMOVED, e -> {
+            ClientStorageUISession.closeBoth();
         });
     }
 
@@ -129,7 +132,7 @@ public class StorageEditor extends UIElement {
                                             if (nodes.size() != 1) return;
                                             var node = nodes.iterator().next();
                                             if (node.getContent() == null) return;
-                                            setCurrentStorage(node.getContent(), node.isClient());
+                                            setSelectedStorage(node.getContent(), node.isClient());
                                         })
                         )
                         .layout(layout -> {
@@ -141,7 +144,7 @@ public class StorageEditor extends UIElement {
         return storagesView;
     }
 
-    private View createCurrentStorageView() {
+    private @NotNull View createCurrentStorageView() {
         var contentView = new View();
         contentView.setDynamicName(() -> translation("view", "content"));
         contentView.addChild(storageViewer);
@@ -160,29 +163,28 @@ public class StorageEditor extends UIElement {
         storageTreeList.setServerData(serverStoragesMetadata);
     }
 
+    public void putAllServerMetadata(Map<StorageKey<?>, StorageMetadata> metadataMap) {
+        serverStoragesMetadata.putAll(metadataMap);
+        storageTreeList.setServerData(serverStoragesMetadata);
+    }
+
     public void putClientMetadata(StorageKey<?> key, StorageMetadata metadata) {
         clientStoragesMetadata.put(key, metadata);
         storageTreeList.setClientData(clientStoragesMetadata);
     }
 
-    protected void setCurrentStorage(StorageKey<?> key, boolean isClient) {
-        StorageMetadata metadata = (isClient ? clientStoragesMetadata : serverStoragesMetadata).get(key);
+    public void putAllClientMetadata(Map<StorageKey<?>, StorageMetadata> metadataMap) {
+        clientStoragesMetadata.putAll(metadataMap);
+        storageTreeList.setClientData(clientStoragesMetadata);
+    }
 
-        storageViewer.setSelectedStorage(key, metadata);
-        loadersViewer.setSelectedStorage(key, metadata);
+    protected void setSelectedStorage(StorageKey<?> key, boolean isClient) {
+        storageViewer.setSelectedStorage(key, isClient);
+        loadersViewer.setSelectedStorage(key, isClient);
     }
 
     @Contract(" -> new")
     public static @NotNull ModularUI createModularUI() {
-        return ModularUI.of(UI.of(new StorageEditor(), StylesheetManager.ORE_MERGED));
-    }
-
-    @RPCPacket("onServerMetadataUpdate")
-    public static void onServerMetadataUpdate(@NotNull RPCSender sender, StorageKey<?> key, StorageMetadata metadata) {
-        if (sender.isRemote()) return;
-        if (!(Minecraft.getInstance().screen instanceof ModularUIScreen modularUIScreen)) return;
-        if (!(modularUIScreen.modularUI.ui.rootElement instanceof StorageEditor storageEditor)) return;
-
-        storageEditor.putServerMetadata(key, metadata);
+        return ModularUI.of(UI.of(new StorageUI(), StylesheetManager.ORE_MERGED));
     }
 }

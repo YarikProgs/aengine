@@ -1,22 +1,31 @@
 package net.aros.engine.client.gui.ui.elements;
 
 import com.lowdragmc.lowdraglib2.gui.texture.IGuiTexture;
+import com.lowdragmc.lowdraglib2.gui.texture.Icons;
 import com.lowdragmc.lowdraglib2.gui.texture.SpriteTexture;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.data.Vertical;
+import com.lowdragmc.lowdraglib2.gui.ui.elements.Button;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
+import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvent;
 import dev.vfyjxf.taffy.style.FlexDirection;
+import net.aros.engine.client.ArosEngineClient;
 import net.aros.engine.client.gui.util.AeColors;
-import net.aros.engine.client.gui.util.StorageDependent;
+import net.aros.engine.client.gui.util.StorageDependentUIElement;
+import net.aros.engine.client.session.ClientStorageUISession;
 import net.aros.engine.common.ArosEngine;
+import net.aros.engine.common.api.storage.storage.StorageKey;
 import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
+import java.util.Map;
+
 import static net.aros.engine.common.ArosEngine.translation;
 
-public class StorageViewer extends UIElement implements StorageDependent {
+public class StorageViewer extends StorageDependentUIElement {
     public static final IGuiTexture CHEST = SpriteTexture
             .of(ArosEngine.id("textures/gui/sprites/widget/chest.png"))
             .setSprite(0, 0, 128, 128);
@@ -31,8 +40,15 @@ public class StorageViewer extends UIElement implements StorageDependent {
     private final Label storageStatusLabel = new Label();
     private final Label storageLoadTimeLabel = new Label();
     private final Label storageEntriesLabel = new Label();
+    private final Button reloadStoragesButton = new Button();
+    private final ScrollerView scrollerView = new ScrollerView();
 
-    public StorageViewer() {
+    public StorageViewer(
+            Map<StorageKey<?>, StorageMetadata> serverMetadata,
+            Map<StorageKey<?>, StorageMetadata> clientMetadata
+    ) {
+        super(serverMetadata, clientMetadata);
+
         int maxComponentWidth = Math.max(
                 Math.max(Minecraft.getInstance().font.width(STATUS), Minecraft.getInstance().font.width(LOAD_TIME)),
                 Minecraft.getInstance().font.width(ENTRIES)
@@ -45,10 +61,20 @@ public class StorageViewer extends UIElement implements StorageDependent {
                 })
                 .addChildren(
                         new UIElement()
+                                .layout(layout -> layout.flexDirection(FlexDirection.ROW))
                                 .addClass("preview_bg")
-                                .addChild(
+                                .addChildren(
                                         storageNameLabel // Storage name
                                                 .textStyle(textStyle -> textStyle.textAlignVertical(Vertical.CENTER))
+                                                .layout(layout -> {
+                                                    layout.flex(1);
+                                                    layout.heightPercent(100);
+                                                }),
+                                        reloadStoragesButton
+                                                .setText(translation("text", "reload_storage"))
+                                                .addPostIcon(Icons.REPLAY)
+                                                .setOnClick(this::doReload)
+                                                .addClass("__white_icon__")
                                 ),
                         new UIElement()
                                 .layout(l -> l.flexDirection(FlexDirection.ROW))
@@ -91,7 +117,7 @@ public class StorageViewer extends UIElement implements StorageDependent {
                                                 .layout(layout -> layout.flex(1).marginTop(-2))
                                                 .addClass("preview_bg")
                                                 .addChild(
-                                                        new ScrollerView()
+                                                        scrollerView
                                                                 .addScrollViewChildren(
                                                                         new Label().setText("A"),
                                                                         new Label().setText("A"),
@@ -137,8 +163,15 @@ public class StorageViewer extends UIElement implements StorageDependent {
         onSelectedStorageChanged(null);
     }
 
+    private void doReload(UIEvent uiEvent) {
+        reloadStoragesButton.setText(translation("text", "reloading"));
+        reloadStoragesButton.setActive(false);
+
+        // TODO: specific reload
+    }
+
     @Override
-    public void onSelectedStorageChanged(SelectedStorage selectedStorage) {
+    protected void onSelectedStorageChanged(SelectedStorage selectedStorage) {
         removeChild(content);
         removeChild(emptyContent);
         if (selectedStorage == null) {
@@ -155,9 +188,13 @@ public class StorageViewer extends UIElement implements StorageDependent {
         storageStatusLabel.setText(status.getName());
         storageStatusLabel.textStyle(textStyle -> textStyle.textColor(AeColors.getStatusColor(status)));
 
-        storageLoadTimeLabel.setText(loadTime + "ms", false);
+        storageLoadTimeLabel.setText(loadTimeToString(loadTime), false);
         storageLoadTimeLabel.textStyle(textStyle -> textStyle.textColor(AeColors.getLoadTimeColor(loadTime)));
 
         storageEntriesLabel.setText(String.valueOf(0));
+    }
+
+    private static String loadTimeToString(long loadTimeMs) {
+        return loadTimeMs == -1 ? "-" : loadTimeMs + "ms";
     }
 }

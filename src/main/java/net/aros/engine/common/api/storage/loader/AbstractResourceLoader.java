@@ -38,8 +38,6 @@ public abstract class AbstractResourceLoader<T> {
     @Contract("_ -> new")
     public final @NotNull CompletableFuture<Map<ResourceLocation, T>> parseAll(@NotNull ResourceManager manager) {
         return CompletableFuture.supplyAsync(() -> {
-            metadata = new LoaderMetadata(-1, LoadStatus.RELOADING);
-
             LoadStatus[] status = { LoadStatus.OK };
             Map<ResourceLocation, T> parsed = new HashMap<>();
 
@@ -86,6 +84,10 @@ public abstract class AbstractResourceLoader<T> {
 
     public final LoaderMetadata getMetadata() {
         return metadata;
+    }
+
+    public final void markReloadStart() {
+        metadata = new LoaderMetadata(-1, LoadStatus.RELOADING);
     }
 
     public interface KeyFunction<T> {

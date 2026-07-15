@@ -6,21 +6,29 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.client.gui.util.AeColors;
-import net.aros.engine.client.gui.util.StorageDependent;
+import net.aros.engine.client.gui.util.StorageDependentUIElement;
+import net.aros.engine.common.api.storage.storage.StorageKey;
 import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
 import net.aros.engine.common.api.storage.storage.metadata.LoaderMetadata;
+import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 import static net.aros.engine.common.ArosEngine.translation;
 
-public class LoadersViewer extends UIElement implements StorageDependent {
+public class LoadersViewer extends StorageDependentUIElement {
     private final UIElement content = new UIElement();
     private final UIElement emptyContent = new EmptyStorageStateElement();
     private final ScrollerView scrollerView = new ScrollerView();
 
-    public LoadersViewer() {
+    public LoadersViewer(
+            Map<StorageKey<?>, StorageMetadata> serverMetadata,
+            Map<StorageKey<?>, StorageMetadata> clientMetadata
+    ) {
+        super(serverMetadata, clientMetadata);
         getLayout().flex(1);
 
         content.layout(layout -> {
@@ -56,7 +64,7 @@ public class LoadersViewer extends UIElement implements StorageDependent {
     }
 
     @Override
-    public void onSelectedStorageChanged(SelectedStorage selectedStorage) {
+    protected void onSelectedStorageChanged(SelectedStorage selectedStorage) {
         removeChild(content);
         removeChild(emptyContent);
         if (selectedStorage == null) {
@@ -84,8 +92,12 @@ public class LoadersViewer extends UIElement implements StorageDependent {
                         }),
                 new Label().setText(metadata.loadStatus().getName()).layout(layout -> layout.flex(0.25f))
                         .style(style -> style.color(AeColors.getStatusColor(metadata.loadStatus()))),
-                new Label().setText(metadata.lastLoadTimeMs() + "ms").layout(layout -> layout.flex(0.25f))
+                new Label().setText(loadTimeToString(metadata.lastLoadTimeMs())).layout(layout -> layout.flex(0.25f))
                         .style(style -> style.color(AeColors.getLoadTimeColor(metadata.lastLoadTimeMs())))
         );
+    }
+
+    private static String loadTimeToString(long loadTimeMs) {
+        return loadTimeMs == -1 ? "-" : loadTimeMs + "ms";
     }
 }

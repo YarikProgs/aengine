@@ -19,11 +19,15 @@ public record StorageMetadata(Map<ResourceLocation, LoaderMetadata> loadersMetad
     );
 
     public long lastLoadTimeMs() {
+        boolean anyLoaded = false;
         long loadTimeMs = 0;
         for (LoaderMetadata loaderMetadata : loadersMetadata.values()) {
+            if (loaderMetadata.lastLoadTimeMs() == -1) continue;
+
             loadTimeMs += loaderMetadata.lastLoadTimeMs();
+            anyLoaded = true;
         }
-        return loadTimeMs;
+        return anyLoaded ? loadTimeMs : -1;
     }
 
     public LoadStatus loadStatus() {

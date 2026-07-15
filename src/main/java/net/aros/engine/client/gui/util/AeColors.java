@@ -23,6 +23,8 @@ public class AeColors {
     }
 
     public static int getLoadTimeColor(long loadTimeMs) {
+        if (loadTimeMs == -1)
+            return 0xFFaaaaaa;
         if (loadTimeMs < OK_TIME_THRESHOLD_MS)
             return SOFT_GREEN_COLOR;
         if (loadTimeMs < WARN_TIME_THRESHOLD_MS)

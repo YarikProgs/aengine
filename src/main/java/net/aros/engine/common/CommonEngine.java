@@ -2,6 +2,7 @@ package net.aros.engine.common;
 
 import net.aros.engine.common.api.storage.storage.AbstractStorage;
 import net.aros.engine.common.api.storage.value.ValueAccess;
+import net.aros.engine.common.storage.ServerStorageUISessionManager;
 import net.aros.engine.common.storage.StorageManager;
 import net.aros.engine.common.systems.CustomStorageSystem;
 import net.aros.engine.common.systems.ServerTickSystem;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommonEngine {
-    private final StorageManager storageManager = new StorageManager();
+    private final StorageManager storageManager = new StorageManager(new ServerStorageUISessionManager());
     private final List<ServerTickSystem> tickSystems = new ArrayList<>();
     private ValueAccess valueAccess;
 
@@ -52,6 +53,7 @@ public class CommonEngine {
 
         storageManager().putAll(ctx.getRegisteredStorages());
         for (AbstractStorage<?> storage : ctx.getRegisteredStorages().values()) {
+            storage.setManager(storageManager);
             ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(storage.createReloadListener());
         }
     }

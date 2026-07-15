@@ -48,7 +48,7 @@ public class StorageSavedData extends SavedData {
 
     @Override
     public @NotNull CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        values.forEach((key, value) -> nbt.put(key, value.encode(NbtOps.INSTANCE).getOrThrow()));
+        values.forEach((key, value) -> nbt.put(key, Value.CODEC.encodeStart(NbtOps.INSTANCE, value).getOrThrow()));
         return nbt;
     }
 
@@ -57,7 +57,7 @@ public class StorageSavedData extends SavedData {
     private static StorageSavedData readNbt(@NotNull CompoundTag nbt, HolderLookup.Provider registryLookup) {
         var data = new StorageSavedData();
         for (String key : nbt.getAllKeys()) {
-            data.values.put(key, Value.parse(NbtOps.INSTANCE, nbt.get(key)).getOrThrow());
+            data.values.put(key, Value.CODEC.parse(NbtOps.INSTANCE, nbt.get(key)).getOrThrow());
         }
         return data;
     }

@@ -2,6 +2,7 @@ package net.aros.engine.common.systems;
 
 import net.aros.engine.common.api.storage.storage.AbstractStorage;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,7 @@ public interface CustomStorageSystem {
     class Context {
         private final Map<StorageKey<?>, AbstractStorage<?>> registeredStorages = new HashMap<>();
 
-        public <T extends AbstractStorage<?>> T registerStorage(T storage) {
+        public <T extends AbstractStorage<?>> T registerStorage(@NotNull T storage) {
             registeredStorages.put(storage.getKey(), storage);
             return storage;
         }

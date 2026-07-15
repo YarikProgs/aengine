@@ -1,9 +1,11 @@
 package net.aros.engine.client;
 
 import net.aros.engine.client.api.ui.ModuleUIProvider;
+import net.aros.engine.client.storage.ClientStorageUISessionManager;
 import net.aros.engine.client.systems.ClientTickSystem;
 import net.aros.engine.client.systems.ModuleUISystem;
 import net.aros.engine.common.api.storage.storage.AbstractStorage;
+import net.aros.engine.common.storage.ServerStorageUISessionManager;
 import net.aros.engine.common.storage.StorageManager;
 import net.aros.engine.common.systems.CustomStorageSystem;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -17,9 +19,9 @@ import java.util.*;
 
 public class ClientEngine {
     private final List<ClientTickSystem> tickSystems = new ArrayList<>();
-
     private final Map<ResourceLocation, ModuleUIProvider> uiProviders = new HashMap<>();
-    private final StorageManager storageManager = new StorageManager();
+
+    private final StorageManager storageManager = new StorageManager(new ClientStorageUISessionManager());
 
     public void initializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(this::clientTick);
@@ -49,6 +51,7 @@ public class ClientEngine {
 
         storageManager().putAll(ctx.getRegisteredStorages());
         for (AbstractStorage<?> storage : ctx.getRegisteredStorages().values()) {
+            storage.setManager(storageManager);
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(storage.createReloadListener());
         }
     }

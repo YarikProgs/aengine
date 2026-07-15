@@ -15,6 +15,7 @@
   "text.aengine.reloading": "Reloading...",
   "text.aengine.name": "Name",
   "text.aengine.path": "Path",
+  "text.aengine.reload_storage": "Reload storage",
   "load_status.aengine.ok": "OK",
   "load_status.aengine.fail": "Fail",
   "load_status.aengine.reloading": "Reloading...",

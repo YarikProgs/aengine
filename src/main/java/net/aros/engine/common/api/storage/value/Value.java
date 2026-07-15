@@ -1,39 +1,21 @@
 package net.aros.engine.common.api.storage.value;
 
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import org.jetbrains.annotations.NotNull;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import java.util.Objects;
 
 public class Value<T> {
-    public static final String TYPE_KEY = "type";
-    public static final String VALUE_KEY = "value";
+    public static final Codec<Value<?>> CODEC = ValueType.CODEC
+            .dispatch(Value::type, Value::valueCodecFromType);
 
     private final ValueType<T> type;
+
     private final T value;
 
     Value(ValueType<T> type, T value) {
         this.type = type;
         this.value = value;
-    }
-
-    public <R> DataResult<R> encode(@NotNull DynamicOps<R> ops) {
-        return ops.mapBuilder()
-                .add(TYPE_KEY, ValueType.CODEC.encodeStart(ops, type))
-                .add(VALUE_KEY, type.valueCodec().encodeStart(ops, value))
-                .build((R) null);
-    }
-
-    public static <R> DataResult<? extends Value<?>> parse(@NotNull DynamicOps<R> ops, R value) {
-        return ops.getMap(value).flatMap(map -> {
-            DataResult<ValueType<?>> type = ValueType.CODEC.parse(ops, map.get(TYPE_KEY));
-            return type.flatMap(t -> parseValue(t, ops, map.get(VALUE_KEY)));
-        });
-    }
-
-    private static <T, R> DataResult<Value<T>> parseValue(@NotNull ValueType<T> type, DynamicOps<R> ops, R value) {
-        return type.valueCodec().parse(ops, value).map(type::create);
     }
 
     public ValueType<T> type() {
@@ -42,6 +24,10 @@ public class Value<T> {
 
     public T value() {
         return value;
+    }
+
+    private static <T> MapCodec<Value<T>> valueCodecFromType(ValueType<T> type) {
+        return type.valueCodec().xmap(type::create, Value::value).fieldOf("value");
     }
 
     @Override
