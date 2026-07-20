@@ -21,7 +21,6 @@ import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 

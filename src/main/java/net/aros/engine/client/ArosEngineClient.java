@@ -1,7 +1,7 @@
 package net.aros.engine.client;
 
-import net.aros.engine.client.init.AeLdlibTypes;
 import net.aros.engine.client.init.AeKeybinds;
+import net.aros.engine.client.init.AeLdlibTypes;
 import net.aros.engine.client.modules.StorageClientModule;
 import net.aros.engine.common.ArosEngine;
 import net.aros.examples.client.ArosEngineClientExamples;

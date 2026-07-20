@@ -6,7 +6,6 @@ import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class AeIcons {
     public static final IGuiTexture CHECK = SpriteTexture

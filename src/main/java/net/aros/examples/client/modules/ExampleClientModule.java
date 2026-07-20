@@ -3,7 +3,6 @@ package net.aros.examples.client.modules;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.storage.DirectStorage;
 import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.type.StorageType;
 import net.aros.engine.common.systems.CustomStorageSystem;
 import net.aros.examples.common.modules.txt.Txt;
 import net.aros.examples.common.modules.txt.TxtLoader;

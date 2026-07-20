@@ -1,8 +1,6 @@
 package net.aros.engine.common.api.storage.storage;
 
 import net.aros.engine.common.api.storage.storage.type.StorageType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;

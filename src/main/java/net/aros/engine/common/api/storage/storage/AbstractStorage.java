@@ -6,8 +6,6 @@ import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.aros.engine.common.api.storage.storage.type.StorageType;
 import net.aros.engine.common.storage.StorageManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;

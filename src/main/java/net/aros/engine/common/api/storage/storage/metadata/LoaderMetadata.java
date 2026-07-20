@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 
 public record LoaderMetadata(long lastLoadTimeMs, LoadStatus loadStatus) {
     public static final Codec<LoaderMetadata> CODEC = RecordCodecBuilder.create(inst -> inst.group(

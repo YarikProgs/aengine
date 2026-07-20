@@ -6,8 +6,6 @@ import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Map;
-
 public interface StorageUISessionManager {
     void create(Player player);
 
