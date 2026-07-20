@@ -7,13 +7,11 @@ import com.lowdragmc.lowdraglib2.gui.texture.SpriteTexture;
 import com.lowdragmc.lowdraglib2.gui.ui.ModularUI;
 import com.lowdragmc.lowdraglib2.gui.ui.UI;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
-import com.lowdragmc.lowdraglib2.gui.ui.elements.BindableValue;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Button;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.gui.ui.style.StylesheetManager;
 import com.lowdragmc.lowdraglib2.gui.ui.styletemplate.OreSprites;
-import com.mojang.logging.LogUtils;
 import dev.vfyjxf.taffy.style.AlignItems;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.client.gui.ui.elements.LoadersViewer;
@@ -21,30 +19,31 @@ import net.aros.engine.client.gui.ui.elements.StorageTreeList;
 import net.aros.engine.client.gui.ui.elements.StorageViewer;
 import net.aros.engine.client.gui.util.StorageDependentUIElement;
 import net.aros.engine.client.session.ClientStorageUISession;
+import net.aros.engine.common.api.storage.storage.StorageEntry;
 import net.aros.engine.common.api.storage.storage.StorageKey;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import org.appliedenergistics.yoga.YogaEdge;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.aros.engine.common.ArosEngine.translation;
 
 public class StorageUI extends UIElement {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    private final Map<StorageKey<?>, StorageMetadata> serverStoragesMetadata = new HashMap<>();
-    private final Map<StorageKey<?>, StorageMetadata> clientStoragesMetadata = new HashMap<>();
+    private final StorageInfo clientInfo = new StorageInfo();
+    private final StorageInfo serverInfo = new StorageInfo();
 
     public final SplittableWindow rootWindow;
     public SplittableWindow leftWindow, centerWindow;
 
     public final StorageTreeList storageTreeList = new StorageTreeList();
-    public final StorageDependentUIElement storageViewer = new StorageViewer(serverStoragesMetadata, clientStoragesMetadata);
-    public final StorageDependentUIElement loadersViewer = new LoadersViewer(serverStoragesMetadata, clientStoragesMetadata);
+    public final StorageDependentUIElement storageViewer = new StorageViewer(serverInfo, clientInfo);
+    public final StorageDependentUIElement loadersViewer = new LoadersViewer(serverInfo, clientInfo);
 
     public final UIElement top = new UIElement();
     public final UIElement icon = new UIElement();
@@ -158,24 +157,35 @@ public class StorageUI extends UIElement {
         return loadersView;
     }
 
-    public void putServerMetadata(StorageKey<?> key, StorageMetadata metadata) {
-        serverStoragesMetadata.put(key, metadata);
-        storageTreeList.setServerData(serverStoragesMetadata);
+    public void putMetadata(StorageKey<?> key, StorageMetadata metadata, boolean isClient) {
+        if (isClient) {
+            clientInfo.metadata().put(key, metadata);
+            storageTreeList.setClientData(clientInfo.metadata());
+        } else {
+            serverInfo.metadata().put(key, metadata);
+            storageTreeList.setServerData(serverInfo.metadata());
+        }
     }
 
-    public void putAllServerMetadata(Map<StorageKey<?>, StorageMetadata> metadataMap) {
-        serverStoragesMetadata.putAll(metadataMap);
-        storageTreeList.setServerData(serverStoragesMetadata);
+    public void putAllMetadata(Map<StorageKey<?>, StorageMetadata> metadataMap, boolean isClient) {
+        if (isClient) {
+            clientInfo.metadata().putAll(metadataMap);
+            storageTreeList.setClientData(clientInfo.metadata());
+        } else {
+            serverInfo.metadata().putAll(metadataMap);
+            storageTreeList.setServerData(serverInfo.metadata());
+        }
     }
 
-    public void putClientMetadata(StorageKey<?> key, StorageMetadata metadata) {
-        clientStoragesMetadata.put(key, metadata);
-        storageTreeList.setClientData(clientStoragesMetadata);
+    public <T> void putContents(@NotNull ContentUpdate<T> entries, boolean isClient) {
+        //noinspection unchecked,rawtypes
+        (isClient ? clientInfo : serverInfo).contents().put(entries.key(), (Set) entries.entries());
     }
 
-    public void putAllClientMetadata(Map<StorageKey<?>, StorageMetadata> metadataMap) {
-        clientStoragesMetadata.putAll(metadataMap);
-        storageTreeList.setClientData(clientStoragesMetadata);
+    public void putAllContents(@NotNull List<ContentUpdate<?>> contents, boolean isClient) {
+        for (ContentUpdate<?> update : contents) {
+            putContents(update, isClient);
+        }
     }
 
     protected void setSelectedStorage(StorageKey<?> key, boolean isClient) {
@@ -186,5 +196,13 @@ public class StorageUI extends UIElement {
     @Contract(" -> new")
     public static @NotNull ModularUI createModularUI() {
         return ModularUI.of(UI.of(new StorageUI(), StylesheetManager.ORE_MERGED));
+    }
+
+    public record StorageInfo(Map<StorageKey<?>, StorageMetadata> metadata,
+                              Map<StorageKey<?>, Set<StorageEntry<?>>> contents) {
+
+        StorageInfo() {
+            this(new HashMap<>(), new HashMap<>());
+        }
     }
 }

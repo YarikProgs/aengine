@@ -4,19 +4,19 @@ import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import net.aros.engine.client.ArosEngineClient;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import net.aros.engine.common.storage.StorageUISessionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ClientStorageUISessionManager implements StorageUISessionManager {
     @Override
     public void create(Player player) {
-        collectAndSetMetadataMap();
+        sendInitialInfo();
     }
 
     @Override
@@ -25,21 +25,32 @@ public class ClientStorageUISessionManager implements StorageUISessionManager {
 
     @Override
     public void sendMetadata(StorageKey<?> key, StorageMetadata metadata) {
-        getCurrentStorageUI().ifPresent(ui -> ui.putClientMetadata(key, metadata));
+        getCurrentStorageUI().ifPresent(ui -> ui.putMetadata(key, metadata, true));
     }
 
     @Override
-    public void sendMetadataMap(Map<StorageKey<?>, StorageMetadata> metadataMap) {
-        getCurrentStorageUI().ifPresent(ui -> ui.putAllClientMetadata(metadataMap));
+    public void sendInitialData(InitialData initialData) {
+        getCurrentStorageUI().ifPresent(ui -> {
+            ui.putAllMetadata(initialData.metadataMap(), true);
+            ui.putAllContents(initialData.contentsList(), true);
+        });
     }
 
-    private void collectAndSetMetadataMap() {
-        Map<StorageKey<?>, StorageMetadata> map = new HashMap<>();
+    @Override
+    public <T> void sendContentUpdate(ContentUpdate<T> update) {
+        getCurrentStorageUI().ifPresent(ui -> ui.putContents(update, true));
+    }
+
+    private void sendInitialInfo() {
+        Map<StorageKey<?>, StorageMetadata> metadataMap = new HashMap<>();
+        List<ContentUpdate<?>> contentsList = new ArrayList<>();
         ArosEngineClient.getEngine().storageManager().getAll().forEach((key, storage) -> {
             if (storage.getMetadata() != null)
-                map.put(key, storage.getMetadata());
+                metadataMap.put(key, storage.getMetadata());
+            //noinspection unchecked,rawtypes
+            contentsList.add(new ContentUpdate<>(key, (Set) storage.entrySet()));
         });
-        sendMetadataMap(map);
+        sendInitialData(new InitialData(metadataMap, contentsList));
     }
 
     private static Optional<StorageUI> getCurrentStorageUI() {

@@ -1,5 +1,8 @@
 package net.aros.engine.common.api.storage.storage;
 
+import net.aros.engine.common.api.storage.storage.type.StorageType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -7,8 +10,8 @@ import java.util.*;
 public class DirectStorage<T> extends AbstractStorage<T> {
     private final Map<ResourceLocation, T> elements = new HashMap<>();
 
-    public DirectStorage(StorageKey<T> key) {
-        super(key);
+    public DirectStorage(StorageKey<T> key, StorageType<T> type) {
+        super(key, type);
     }
 
     @Override
@@ -29,7 +32,7 @@ public class DirectStorage<T> extends AbstractStorage<T> {
     public Set<StorageEntry<T>> entrySet() {
         Set<StorageEntry<T>> set = new HashSet<>();
         for (Map.Entry<ResourceLocation, T> entry : elements.entrySet()) {
-            set.add(new StorageEntry<>(entry.getKey(), entry.getValue()));
+            set.add(new StorageEntry<>(type, entry.getKey(), entry.getValue()));
         }
         return set;
     }

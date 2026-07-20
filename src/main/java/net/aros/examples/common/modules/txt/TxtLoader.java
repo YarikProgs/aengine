@@ -19,7 +19,6 @@ public class TxtLoader extends AbstractResourceLoader<Txt> {
     @Override
     public DataResult<Txt> parse(ResourceLocation path, Resource resource) throws Exception {
         if (!isGood) throw new IOException("Failed to... be good?");
-        Thread.sleep(2000);
         try (var is = resource.open()) {
             return DataResult.success(new Txt(new String(is.readAllBytes(), Charset.defaultCharset())));
         }

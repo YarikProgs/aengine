@@ -10,18 +10,20 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvent;
 import dev.vfyjxf.taffy.style.FlexDirection;
-import net.aros.engine.client.ArosEngineClient;
+import net.aros.engine.client.api.ui.StorageTypeUiElementFactories;
+import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.util.AeColors;
 import net.aros.engine.client.gui.util.StorageDependentUIElement;
-import net.aros.engine.client.session.ClientStorageUISession;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.StorageEntry;
 import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
 
 import static net.aros.engine.common.ArosEngine.translation;
 
@@ -44,10 +46,10 @@ public class StorageViewer extends StorageDependentUIElement {
     private final ScrollerView scrollerView = new ScrollerView();
 
     public StorageViewer(
-            Map<StorageKey<?>, StorageMetadata> serverMetadata,
-            Map<StorageKey<?>, StorageMetadata> clientMetadata
+            StorageUI.StorageInfo serverInfo,
+            StorageUI.StorageInfo clientInfo
     ) {
-        super(serverMetadata, clientMetadata);
+        super(serverInfo, clientInfo);
 
         int maxComponentWidth = Math.max(
                 Math.max(Minecraft.getInstance().font.width(STATUS), Minecraft.getInstance().font.width(LOAD_TIME)),
@@ -108,49 +110,14 @@ public class StorageViewer extends StorageDependentUIElement {
                                         new UIElement().layout(layout -> {
                                             layout.flexDirection(FlexDirection.ROW);
                                         }).addChildren(
-                                                new Label().setText(translation("text", "name"))
-                                                        .layout(l -> l.flex(0.5f)),
-                                                new Label().setText(translation("text", "path"))
-                                                        .layout(l -> l.flex(0.5f))
+                                                new Label().setText(translation("text", "loaded_elements").append(": "))
+                                                        .layout(l -> l.flex(1f))
                                         ).addClass("preview_bg"),
                                         new UIElement()
                                                 .layout(layout -> layout.flex(1).marginTop(-2))
                                                 .addClass("preview_bg")
                                                 .addChild(
                                                         scrollerView
-                                                                .addScrollViewChildren(
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A"),
-                                                                        new Label().setText("A")
-                                                                )
                                                                 .viewPort(port -> {
                                                                     port.getStyle().backgroundTexture(IGuiTexture.EMPTY);
                                                                     port.getLayout().paddingAll(0);
@@ -160,7 +127,7 @@ public class StorageViewer extends StorageDependentUIElement {
                                                 )
                                 )
                 );
-        onSelectedStorageChanged(null);
+        onStorageMetadataChanged(null);
     }
 
     private void doReload(UIEvent uiEvent) {
@@ -171,19 +138,32 @@ public class StorageViewer extends StorageDependentUIElement {
     }
 
     @Override
-    protected void onSelectedStorageChanged(SelectedStorage selectedStorage) {
+    protected void onStorageContentsChanged(Set<StorageEntry<?>> entries) {
+        scrollerView.clearAllScrollViewChildren();
+
+        if (entries == null || entries.isEmpty()) return;
+
+        scrollerView.addScrollViewChildren(
+                entries.stream().sorted(Comparator.comparing(StorageEntry::key))
+                        .map(StorageTypeUiElementFactories::create)
+                        .toArray(UIElement[]::new)
+        );
+    }
+
+    @Override
+    protected void onStorageMetadataChanged(StorageMetadata metadata) {
         removeChild(content);
         removeChild(emptyContent);
-        if (selectedStorage == null) {
+        if (metadata == null) {
             addChild(emptyContent);
             return;
         }
         addChild(content);
 
-        long loadTime = selectedStorage.metadata().lastLoadTimeMs();
-        LoadStatus status = selectedStorage.metadata().loadStatus();
+        long loadTime = metadata.lastLoadTimeMs();
+        LoadStatus status = metadata.loadStatus();
 
-        storageNameLabel.setText(translation("text", "storage").append(": ").append(selectedStorage.key().toString()));
+        storageNameLabel.setText(translation("text", "storage").append(": ").append(selectedKey.toString()));
 
         storageStatusLabel.setText(status.getName());
         storageStatusLabel.textStyle(textStyle -> textStyle.textColor(AeColors.getStatusColor(status)));

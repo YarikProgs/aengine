@@ -5,6 +5,7 @@ import net.aros.engine.common.api.storage.storage.StorageAccess;
 import net.aros.engine.common.api.storage.storage.StorageEntry;
 import net.aros.engine.common.api.storage.storage.StorageKey;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,8 +37,8 @@ public class StorageManager {
         sessionManager.sendMetadata(key, metadata);
     }
 
-    public <T> void onContentUpdate(Set<StorageEntry<T>> entries) {
-
+    public <T> void onContentUpdate(StorageKey<T> key, Set<StorageEntry<T>> entries) {
+        sessionManager.sendContentUpdate(new ContentUpdate<>(key, entries));
     }
 
     public Map<StorageKey<?>, AbstractStorage<?>> getAll() {

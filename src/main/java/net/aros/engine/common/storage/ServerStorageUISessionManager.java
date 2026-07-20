@@ -3,16 +3,16 @@ package net.aros.engine.common.storage;
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import net.aros.engine.common.session.ServerStorageUISession;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ServerStorageUISessionManager implements StorageUISessionManager {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -29,7 +29,7 @@ public class ServerStorageUISessionManager implements StorageUISessionManager {
             close(player);
         }
         sessions.put(player.getUUID(), new Session(serverPlayer));
-        collectAndSetMetadataMapTo(player);
+        sendInitialDataTo(player);
     }
 
     @Override
@@ -53,34 +53,42 @@ public class ServerStorageUISessionManager implements StorageUISessionManager {
     }
 
     @Override
-    public void sendMetadataMap(Map<StorageKey<?>, StorageMetadata> metadataMap) {
+    public void sendInitialData(InitialData initialData) {
         for (Session session : sessions.values()) {
-            session.sendMetadataMap(metadataMap);
+            session.sendInitialData(initialData);
         }
     }
 
-    private void collectAndSetMetadataMapTo(@NotNull Player player) {
-        Map<StorageKey<?>, StorageMetadata> map = new HashMap<>();
-        ArosEngine.getEngine().storageManager().getAll().forEach((key, storage) -> {
-            if (storage.getMetadata() != null)
-                map.put(key, storage.getMetadata());
-        });
-        sessions.get(player.getUUID()).sendMetadataMap(map);
+    @Override
+    public <T> void sendContentUpdate(ContentUpdate<T> update) {
+        for (Session session : sessions.values()) {
+            session.sendContentUpdate(update);
+        }
     }
 
-    private static class Session {
-        private final ServerPlayer owner;
+    private void sendInitialDataTo(@NotNull Player player) {
+        Map<StorageKey<?>, StorageMetadata> metadataMap = new HashMap<>();
+        List<ContentUpdate<?>> contentsList = new ArrayList<>();
+        ArosEngine.getEngine().storageManager().getAll().forEach((key, storage) -> {
+            if (storage.getMetadata() != null)
+                metadataMap.put(key, storage.getMetadata());
+            //noinspection unchecked,rawtypes
+            contentsList.add(new ContentUpdate<>(key, (Set) storage.entrySet()));
+        });
+        sessions.get(player.getUUID()).sendInitialData(new InitialData(metadataMap, contentsList));
+    }
 
-        public Session(ServerPlayer owner) {
-            this.owner = owner;
+    private record Session(ServerPlayer owner) {
+        public void sendInitialData(InitialData initialData) {
+            ServerStorageUISession.sendInitialDataTo(owner, initialData);
         }
 
         public void sendMetadata(StorageKey<?> key, StorageMetadata metadata) {
             ServerStorageUISession.sendMetadataTo(owner, key, metadata);
         }
 
-        public void sendMetadataMap(Map<StorageKey<?>, StorageMetadata> metadataMap) {
-            ServerStorageUISession.sendMetadataMapTo(owner, metadataMap);
+        public <T> void sendContentUpdate(ContentUpdate<T> update) {
+            ServerStorageUISession.sendContentUpdate(owner, update);
         }
     }
 }

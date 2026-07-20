@@ -1,7 +1,9 @@
 package net.aros.engine.common.storage;
 
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -13,5 +15,7 @@ public interface StorageUISessionManager {
 
     void sendMetadata(StorageKey<?> key, StorageMetadata metadata);
 
-    void sendMetadataMap(Map<StorageKey<?>, StorageMetadata> metadataMap);
+    void sendInitialData(InitialData initialData);
+
+    <T> void sendContentUpdate(ContentUpdate<T> update);
 }

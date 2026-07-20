@@ -3,8 +3,11 @@ package net.aros.engine.common.api.storage.storage;
 import net.aros.engine.common.api.storage.loader.AbstractResourceLoader;
 import net.aros.engine.common.api.storage.storage.metadata.LoaderMetadata;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.storage.type.StorageType;
 import net.aros.engine.common.storage.StorageManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -18,11 +21,13 @@ import java.util.concurrent.Executor;
 public abstract class AbstractStorage<T> {
     private final StorageKey<T> key;
     private final Map<ResourceLocation, AbstractResourceLoader<T>> loaders = new HashMap<>();
+    protected final StorageType<T> type;
     private StorageManager storageManager;
     private StorageMetadata metadata;
 
-    protected AbstractStorage(StorageKey<T> key) {
+    protected AbstractStorage(StorageKey<T> key, StorageType<T> type) {
         this.key = key;
+        this.type = type;
     }
 
     public abstract Optional<T> get(ResourceLocation key);
@@ -59,7 +64,7 @@ public abstract class AbstractStorage<T> {
     }
 
     private void sendContent() {
-        storageManager.onContentUpdate(entrySet());
+        storageManager.onContentUpdate(key, entrySet());
     }
 
     public StorageMetadata getMetadata() {

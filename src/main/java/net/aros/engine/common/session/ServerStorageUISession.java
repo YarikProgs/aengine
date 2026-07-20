@@ -5,12 +5,11 @@ import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadataMap;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
 
 public class ServerStorageUISession {
     @RPCPacket("session.storageui.create")
@@ -25,11 +24,16 @@ public class ServerStorageUISession {
             ArosEngine.getEngine().storageManager().sessionManager().close(sender.asPlayer());
     }
 
+    public static void sendInitialDataTo(ServerPlayer player, InitialData initialData) {
+        RPCPacketDistributor.rpcToPlayer(player, "session.storageui.receive_initial_data", initialData);
+    }
+
     public static void sendMetadataTo(ServerPlayer player, StorageKey<?> key, StorageMetadata metadata) {
         RPCPacketDistributor.rpcToPlayer(player, "session.storageui.receive_metadata", key, metadata);
     }
 
-    public static void sendMetadataMapTo(ServerPlayer player, Map<StorageKey<?>, StorageMetadata> metadataMap) {
-        RPCPacketDistributor.rpcToPlayer(player, "session.storageui.receive_metadata_map", new StorageMetadataMap(metadataMap));
+    public static <T> void sendContentUpdate(ServerPlayer player, ContentUpdate<T> update) {
+        //noinspection RedundantCast,rawtypes
+        RPCPacketDistributor.rpcToPlayer(player, "session.storageui.receive_content", (ContentUpdate) update);
     }
 }

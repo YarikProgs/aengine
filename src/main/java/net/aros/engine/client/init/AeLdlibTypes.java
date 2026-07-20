@@ -3,8 +3,9 @@ package net.aros.engine.client.init;
 import com.lowdragmc.lowdraglib2.syncdata.AccessorRegistries;
 import com.lowdragmc.lowdraglib2.syncdata.accessor.direct.CustomDirectAccessor;
 import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadataMap;
+import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
 
 public class AeLdlibTypes {
     public static void init() {
@@ -17,9 +18,14 @@ public class AeLdlibTypes {
                 .codec(StorageKey.CODEC)
                 .streamCodec(StorageKey.STREAM_CODEC)
                 .build());
-        AccessorRegistries.registerAccessor(CustomDirectAccessor.builder(StorageMetadataMap.class)
-                .codec(StorageMetadataMap.CODEC)
-                .streamCodec(StorageMetadataMap.STREAM_CODEC)
+        AccessorRegistries.registerAccessor(CustomDirectAccessor.builder(InitialData.class)
+                .codec(InitialData.CODEC)
+                .streamCodec(InitialData.STREAM_CODEC)
+                .build());
+        //noinspection unchecked
+        AccessorRegistries.registerAccessor(CustomDirectAccessor.builder((Class<ContentUpdate<?>>) (Class<?>) ContentUpdate.class)
+                .codec(ContentUpdate.CODEC)
+                .streamCodec(ContentUpdate.STREAM_CODEC)
                 .build());
     }
 }

@@ -5,9 +5,10 @@ import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import dev.vfyjxf.taffy.style.FlexDirection;
+import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.util.AeColors;
 import net.aros.engine.client.gui.util.StorageDependentUIElement;
-import net.aros.engine.common.api.storage.storage.StorageKey;
+import net.aros.engine.common.api.storage.storage.StorageEntry;
 import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
 import net.aros.engine.common.api.storage.storage.metadata.LoaderMetadata;
 import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
@@ -15,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.Set;
 
 import static net.aros.engine.common.ArosEngine.translation;
 
@@ -25,10 +26,10 @@ public class LoadersViewer extends StorageDependentUIElement {
     private final ScrollerView scrollerView = new ScrollerView();
 
     public LoadersViewer(
-            Map<StorageKey<?>, StorageMetadata> serverMetadata,
-            Map<StorageKey<?>, StorageMetadata> clientMetadata
+            StorageUI.StorageInfo serverInfo,
+            StorageUI.StorageInfo clientInfo
     ) {
-        super(serverMetadata, clientMetadata);
+        super(serverInfo, clientInfo);
         getLayout().flex(1);
 
         content.layout(layout -> {
@@ -60,22 +61,26 @@ public class LoadersViewer extends StorageDependentUIElement {
                         )
         );
 
-        onSelectedStorageChanged(null);
+        onStorageMetadataChanged(null);
     }
 
     @Override
-    protected void onSelectedStorageChanged(SelectedStorage selectedStorage) {
+    protected void onStorageContentsChanged(Set<StorageEntry<?>> entries) {
+    }
+
+    @Override
+    protected void onStorageMetadataChanged(StorageMetadata metadata) {
         removeChild(content);
         removeChild(emptyContent);
-        if (selectedStorage == null) {
+        if (metadata == null) {
             addChildren(emptyContent);
             return;
         }
         addChild(content);
 
         scrollerView.clearAllScrollViewChildren();
-        selectedStorage.metadata().loadersMetadata().forEach((key, metadata) -> {
-            scrollerView.addScrollViewChild(createScrollViewChild(key, metadata));
+        metadata.loadersMetadata().forEach((key, loaderMetadata) -> {
+            scrollerView.addScrollViewChild(createScrollViewChild(key, loaderMetadata));
         });
     }
 
