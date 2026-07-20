@@ -1,9 +1,9 @@
-package net.aros.engine.common.api.storage.metadata;
+package net.aros.engine.common.storage;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.aros.engine.common.api.storage.StorageKey;
-import net.aros.engine.common.api.storage.type.ContentUpdate;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

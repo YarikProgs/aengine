@@ -5,9 +5,7 @@ import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.StorageKey;
-import net.aros.engine.common.api.storage.metadata.InitialData;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.type.ContentUpdate;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 

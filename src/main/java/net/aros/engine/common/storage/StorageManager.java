@@ -5,7 +5,6 @@ import net.aros.engine.common.api.storage.StorageAccess;
 import net.aros.engine.common.api.storage.StorageEntry;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.type.ContentUpdate;
 
 import java.util.Collections;
 import java.util.HashMap;

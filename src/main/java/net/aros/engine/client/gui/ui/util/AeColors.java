@@ -1,4 +1,4 @@
-package net.aros.engine.client.gui.util;
+package net.aros.engine.client.gui.ui.util;
 
 import net.aros.engine.common.api.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;

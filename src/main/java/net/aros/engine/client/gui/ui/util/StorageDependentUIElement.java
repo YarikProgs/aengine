@@ -1,4 +1,4 @@
-package net.aros.engine.client.gui.util;
+package net.aros.engine.client.gui.ui.util;
 
 import com.lowdragmc.lowdraglib2.gui.sync.bindings.impl.SupplierDataSource;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;

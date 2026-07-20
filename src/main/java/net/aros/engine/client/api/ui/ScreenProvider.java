@@ -8,9 +8,20 @@ import java.util.function.Function;
 
 public class ScreenProvider implements ModuleUIProvider {
     private final Function<Player, Screen> factory;
+    private final int requiredPermission;
+
+    public ScreenProvider(int requiredPermission, Function<Player, Screen> factory) {
+        this.requiredPermission = requiredPermission;
+        this.factory = factory;
+    }
 
     public ScreenProvider(Function<Player, Screen> factory) {
-        this.factory = factory;
+        this(0, factory);
+    }
+
+    @Override
+    public int requiredPermission() {
+        return requiredPermission;
     }
 
     @Override

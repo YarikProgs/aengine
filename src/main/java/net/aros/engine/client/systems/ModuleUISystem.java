@@ -19,11 +19,19 @@ public interface ModuleUISystem {
         private final Map<ResourceLocation, ModuleUIProvider> providers = new HashMap<>();
 
         public void registerScreen(ResourceLocation moduleKey, Function<Player, Screen> factory) {
-            providers.put(moduleKey, new ScreenProvider(factory));
+            registerScreen(moduleKey, 0, factory);
+        }
+
+        public void registerScreen(ResourceLocation moduleKey, int requiredPermission, Function<Player, Screen> factory) {
+            providers.put(moduleKey, new ScreenProvider(requiredPermission, factory));
         }
 
         public void registerModularUi(ResourceLocation moduleKey, Function<Player, ModularUI> factory) {
-            providers.put(moduleKey, new ModularUIProvider(factory));
+            registerModularUi(moduleKey, 0, factory);
+        }
+
+        public void registerModularUi(ResourceLocation moduleKey, int requiredPermission, Function<Player, ModularUI> factory) {
+            providers.put(moduleKey, new ModularUIProvider(requiredPermission, factory));
         }
 
         public Map<ResourceLocation, ModuleUIProvider> getProviders() {
