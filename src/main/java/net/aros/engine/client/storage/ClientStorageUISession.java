@@ -1,14 +1,14 @@
-package net.aros.engine.client.session;
+package net.aros.engine.client.storage;
 
 import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import net.aros.engine.client.ArosEngineClient;
 import net.aros.engine.client.gui.ui.StorageUI;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.InitialData;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.InitialData;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.type.ContentUpdate;
 import net.minecraft.client.Minecraft;
 
 import java.util.Optional;

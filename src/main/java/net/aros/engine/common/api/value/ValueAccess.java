@@ -1,4 +1,4 @@
-package net.aros.engine.common.api.storage.value;
+package net.aros.engine.common.api.value;
 
 import net.aros.engine.server.StorageSavedData;
 import org.jetbrains.annotations.Contract;

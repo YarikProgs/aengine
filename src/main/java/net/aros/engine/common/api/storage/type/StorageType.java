@@ -1,4 +1,4 @@
-package net.aros.engine.common.api.storage.storage.type;
+package net.aros.engine.common.api.storage.type;
 
 import com.mojang.serialization.Codec;
 import net.aros.engine.common.init.AeRegistries;

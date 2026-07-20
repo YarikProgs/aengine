@@ -2,8 +2,8 @@ package net.aros.engine.common.api.storage.loader;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DataResult;
-import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
-import net.aros.engine.common.api.storage.storage.metadata.LoaderMetadata;
+import net.aros.engine.common.api.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.metadata.LoaderMetadata;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;

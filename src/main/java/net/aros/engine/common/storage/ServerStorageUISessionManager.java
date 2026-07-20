@@ -2,11 +2,10 @@ package net.aros.engine.common.storage;
 
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.InitialData;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
-import net.aros.engine.common.session.ServerStorageUISession;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.InitialData;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.type.ContentUpdate;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;

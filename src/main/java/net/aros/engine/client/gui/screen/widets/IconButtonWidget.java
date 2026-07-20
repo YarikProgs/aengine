@@ -1,4 +1,4 @@
-package net.aros.engine.client.gui.widets;
+package net.aros.engine.client.gui.screen.widets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;

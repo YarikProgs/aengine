@@ -1,4 +1,4 @@
-package net.aros.engine.common.api.storage.storage;
+package net.aros.engine.common.api.storage;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

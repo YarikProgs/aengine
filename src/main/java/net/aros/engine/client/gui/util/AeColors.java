@@ -1,6 +1,6 @@
 package net.aros.engine.client.gui.util;
 
-import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

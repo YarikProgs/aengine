@@ -4,9 +4,9 @@ import com.lowdragmc.lowdraglib2.gui.sync.bindings.impl.SupplierDataSource;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.BindableValue;
 import net.aros.engine.client.gui.ui.StorageUI;
-import net.aros.engine.common.api.storage.storage.StorageEntry;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.StorageEntry;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 
 import java.util.Set;
 

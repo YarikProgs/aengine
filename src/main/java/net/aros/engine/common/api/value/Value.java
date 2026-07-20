@@ -1,4 +1,4 @@
-package net.aros.engine.common.api.storage.value;
+package net.aros.engine.common.api.value;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

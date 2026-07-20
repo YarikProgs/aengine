@@ -1,7 +1,7 @@
 package net.aros.engine.client.init;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.aros.engine.client.gui.EngineScreen;
+import net.aros.engine.client.gui.screen.EngineScreen;
 import net.aros.engine.common.ArosEngine;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;

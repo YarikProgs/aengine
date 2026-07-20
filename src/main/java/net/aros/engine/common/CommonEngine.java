@@ -1,7 +1,7 @@
 package net.aros.engine.common;
 
-import net.aros.engine.common.api.storage.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.value.ValueAccess;
+import net.aros.engine.common.api.storage.AbstractStorage;
+import net.aros.engine.common.api.value.ValueAccess;
 import net.aros.engine.common.storage.ServerStorageUISessionManager;
 import net.aros.engine.common.storage.StorageManager;
 import net.aros.engine.common.systems.CustomStorageSystem;

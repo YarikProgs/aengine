@@ -1,8 +1,8 @@
-package net.aros.engine.client.gui;
+package net.aros.engine.client.gui.screen;
 
 import com.mojang.math.Axis;
 import net.aros.engine.client.ArosEngineClient;
-import net.aros.engine.client.gui.widets.IconButtonWidget;
+import net.aros.engine.client.gui.screen.widets.IconButtonWidget;
 import net.aros.engine.common.ArosEngine;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;

@@ -10,9 +10,9 @@ import com.lowdragmc.lowdraglib2.gui.ui.utils.UIElementProvider;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.client.gui.util.AeColors;
 import net.aros.engine.client.gui.util.AeIcons;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 

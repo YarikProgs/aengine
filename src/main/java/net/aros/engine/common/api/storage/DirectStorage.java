@@ -1,6 +1,6 @@
-package net.aros.engine.common.api.storage.storage;
+package net.aros.engine.common.api.storage;
 
-import net.aros.engine.common.api.storage.storage.type.StorageType;
+import net.aros.engine.common.api.storage.type.StorageType;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;

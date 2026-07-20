@@ -4,7 +4,7 @@ import net.aros.engine.client.api.ui.ModuleUIProvider;
 import net.aros.engine.client.storage.ClientStorageUISessionManager;
 import net.aros.engine.client.systems.ClientTickSystem;
 import net.aros.engine.client.systems.ModuleUISystem;
-import net.aros.engine.common.api.storage.storage.AbstractStorage;
+import net.aros.engine.common.api.storage.AbstractStorage;
 import net.aros.engine.common.storage.StorageManager;
 import net.aros.engine.common.systems.CustomStorageSystem;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

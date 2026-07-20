@@ -1,9 +1,9 @@
-package net.aros.engine.common.api.storage.storage;
+package net.aros.engine.common.api.storage;
 
 import net.aros.engine.common.api.storage.loader.AbstractResourceLoader;
-import net.aros.engine.common.api.storage.storage.metadata.LoaderMetadata;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.type.StorageType;
+import net.aros.engine.common.api.storage.metadata.LoaderMetadata;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.type.StorageType;
 import net.aros.engine.common.storage.StorageManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;

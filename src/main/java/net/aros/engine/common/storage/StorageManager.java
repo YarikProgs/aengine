@@ -1,11 +1,11 @@
 package net.aros.engine.common.storage;
 
-import net.aros.engine.common.api.storage.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.storage.StorageAccess;
-import net.aros.engine.common.api.storage.storage.StorageEntry;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.storage.type.ContentUpdate;
+import net.aros.engine.common.api.storage.AbstractStorage;
+import net.aros.engine.common.api.storage.StorageAccess;
+import net.aros.engine.common.api.storage.StorageEntry;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.type.ContentUpdate;
 
 import java.util.Collections;
 import java.util.HashMap;

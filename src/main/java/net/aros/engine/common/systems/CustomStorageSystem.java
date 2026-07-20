@@ -1,8 +1,8 @@
 package net.aros.engine.common.systems;
 
-import net.aros.engine.common.api.storage.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.type.StorageType;
+import net.aros.engine.common.api.storage.AbstractStorage;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.type.StorageType;
 import net.aros.engine.common.init.AeRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

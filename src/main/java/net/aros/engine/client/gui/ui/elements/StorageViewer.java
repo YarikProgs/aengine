@@ -10,14 +10,14 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvent;
 import dev.vfyjxf.taffy.style.FlexDirection;
-import net.aros.engine.client.api.ui.StorageTypeUiElementFactories;
+import net.aros.engine.client.api.ui.StorageTypeUIElementFactories;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.util.AeColors;
 import net.aros.engine.client.gui.util.StorageDependentUIElement;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.storage.StorageEntry;
-import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
-import net.aros.engine.common.api.storage.storage.metadata.StorageMetadata;
+import net.aros.engine.common.api.storage.StorageEntry;
+import net.aros.engine.common.api.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
@@ -144,7 +144,7 @@ public class StorageViewer extends StorageDependentUIElement {
 
         scrollerView.addScrollViewChildren(
                 entries.stream().sorted(Comparator.comparing(StorageEntry::key))
-                        .map(StorageTypeUiElementFactories::create)
+                        .map(StorageTypeUIElementFactories::create)
                         .toArray(UIElement[]::new)
         );
     }

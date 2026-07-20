@@ -1,11 +1,11 @@
-package net.aros.engine.common.api.storage.storage;
+package net.aros.engine.common.api.storage;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.aros.engine.common.api.storage.storage.type.StorageType;
+import net.aros.engine.common.api.storage.type.StorageType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

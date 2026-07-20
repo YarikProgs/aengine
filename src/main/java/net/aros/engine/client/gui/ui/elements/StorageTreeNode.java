@@ -1,8 +1,8 @@
 package net.aros.engine.client.gui.ui.elements;
 
 import com.lowdragmc.lowdraglib2.gui.util.ITreeNode;
-import net.aros.engine.common.api.storage.storage.StorageKey;
-import net.aros.engine.common.api.storage.storage.metadata.LoadStatus;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

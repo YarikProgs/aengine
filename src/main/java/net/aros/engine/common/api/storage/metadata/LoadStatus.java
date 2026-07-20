@@ -1,4 +1,4 @@
-package net.aros.engine.common.api.storage.storage.metadata;
+package net.aros.engine.common.api.storage.metadata;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;

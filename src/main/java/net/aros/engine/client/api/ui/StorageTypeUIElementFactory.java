@@ -3,12 +3,12 @@ package net.aros.engine.client.api.ui;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import dev.vfyjxf.taffy.style.FlexDirection;
-import net.aros.engine.common.api.storage.storage.StorageEntry;
+import net.aros.engine.common.api.storage.StorageEntry;
 
-public interface StorageTypeUiElementFactory<T> {
+public interface StorageTypeUIElementFactory<T> {
     UIElement create(StorageEntry<T> element);
 
-    final class Default implements StorageTypeUiElementFactory<Object> {
+    final class Default implements StorageTypeUIElementFactory<Object> {
         @Override
         public UIElement create(StorageEntry<Object> element) {
             return new UIElement()
