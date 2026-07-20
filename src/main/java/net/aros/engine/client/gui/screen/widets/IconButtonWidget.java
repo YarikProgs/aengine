@@ -13,11 +13,9 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public class IconButtonWidget extends AbstractButton {
-    private static final ResourceLocation DISABLED_BG = ArosEngine.id("widget/disabled_bg");
     private static final ResourceLocation DISABLED_FG = ArosEngine.id("widget/disabled_fg");
     private static final int WIDTH = EngineScreen.ICON_WIDTH;
     private static final int HEIGHT = EngineScreen.ICON_HEIGHT;
-    private static final int DISABLED_BORDER = 5;
     private final WidgetSprites iconSprite;
     private final Runnable onPress;
     private boolean locked;
