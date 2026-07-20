@@ -140,13 +140,17 @@ public class StorageViewer extends StorageDependentUIElement {
     protected void onStorageContentsChanged(Set<StorageEntry<?>> entries) {
         scrollerView.clearAllScrollViewChildren();
 
-        if (entries == null || entries.isEmpty()) return;
+        if (entries == null || entries.isEmpty()) {
+            storageEntriesLabel.setText(String.valueOf(0));
+            return;
+        }
 
         scrollerView.addScrollViewChildren(
                 entries.stream().sorted(Comparator.comparing(StorageEntry::key))
                         .map(StorageTypeUIElementFactories::create)
                         .toArray(UIElement[]::new)
         );
+        storageEntriesLabel.setText(String.valueOf(entries.size()));
     }
 
     @Override
@@ -169,8 +173,6 @@ public class StorageViewer extends StorageDependentUIElement {
 
         storageLoadTimeLabel.setText(loadTimeToString(loadTime), false);
         storageLoadTimeLabel.textStyle(textStyle -> textStyle.textColor(AeColors.getLoadTimeColor(loadTime)));
-
-        storageEntriesLabel.setText(String.valueOf(0));
     }
 
     private static String loadTimeToString(long loadTimeMs) {

@@ -79,15 +79,15 @@ public class ServerStorageUISessionManager implements StorageUISessionManager {
 
     private record Session(ServerPlayer owner) {
         public void sendInitialData(InitialData initialData) {
-            ServerStorageUISession.sendInitialDataTo(owner, initialData);
+            if (owner.hasPermissions(2)) ServerStorageUISession.sendInitialDataTo(owner, initialData);
         }
 
         public void sendMetadata(StorageKey<?> key, StorageMetadata metadata) {
-            ServerStorageUISession.sendMetadataTo(owner, key, metadata);
+            if (owner.hasPermissions(2)) ServerStorageUISession.sendMetadataTo(owner, key, metadata);
         }
 
         public <T> void sendContentUpdate(ContentUpdate<T> update) {
-            ServerStorageUISession.sendContentUpdate(owner, update);
+            if (owner.hasPermissions(2)) ServerStorageUISession.sendContentUpdate(owner, update);
         }
     }
 }
