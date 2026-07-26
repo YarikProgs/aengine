@@ -53,9 +53,7 @@ public class StorageUI extends UIElement {
     public final Button closeButton = new Button();
 
     public StorageUI() {
-        addEventListener(UIEvents.MUI_CHANGED, e -> {
-            ClientStorageUISession.createBoth();
-        });
+        addEventListener(UIEvents.MUI_CHANGED, e -> ClientStorageUISession.createBoth());
         getLayout().widthPercent(100).heightPercent(100);
 
         rootWindow = new SplittableWindow().setImmortal(true).setAnchorId("root");
@@ -114,9 +112,7 @@ public class StorageUI extends UIElement {
                 getModularUI().getScreen().onClose();
             }
         });
-        addEventListener(UIEvents.REMOVED, e -> {
-            ClientStorageUISession.closeBoth();
-        });
+        addEventListener(UIEvents.REMOVED, e -> ClientStorageUISession.closeBoth());
     }
 
     private @NotNull View createStorageListView() {

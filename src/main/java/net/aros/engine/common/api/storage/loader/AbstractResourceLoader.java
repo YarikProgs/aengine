@@ -74,6 +74,9 @@ public abstract class AbstractResourceLoader<T> {
         return pathKey.withPath(pathKey.getPath().substring(path.length() + 1, pathKey.getPath().length() - fileExtension.length() - 1));
     }
 
+    /**
+     * Use in constructor if key is located inside a file
+     */
     protected final void setKeyFactory(KeyFunction<T> keyFactory) {
         this.keyFactory = Objects.requireNonNull(keyFactory);
     }
@@ -90,6 +93,7 @@ public abstract class AbstractResourceLoader<T> {
         metadata = new LoaderMetadata(-1, LoadStatus.RELOADING);
     }
 
+    @FunctionalInterface
     public interface KeyFunction<T> {
         ResourceLocation getKeyOf(ResourceLocation path, T element);
     }

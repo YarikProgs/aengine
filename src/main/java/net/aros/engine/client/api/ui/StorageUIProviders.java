@@ -9,7 +9,7 @@ import net.aros.engine.common.api.value.ValueType;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StorageTypeUIElementProviders {
+public class StorageUIProviders {
     private static final Factory<?> DEFAULT = new Default();
     private static final Map<ValueType<?>, Factory<?>> PROVIDERS = new HashMap<>();
 

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +53,7 @@ public class ValuesSavedData extends SavedData {
     }
 
     @Override
+    @ParametersAreNonnullByDefault
     public @NotNull CompoundTag save(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         values.forEach((key, value) -> nbt.put(key, Value.CODEC.encodeStart(NbtOps.INSTANCE, value).getOrThrow()));
         return nbt;

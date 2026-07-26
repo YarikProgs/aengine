@@ -35,9 +35,7 @@ public class EmptyStateElement extends UIElement {
                             layout.widthPercent(100);
                             layout.heightPercent(50);
                         })
-                        .style(style -> {
-                            style.color(0xff9b9b9b);
-                        })
+                        .style(style -> style.color(0xff9b9b9b))
         );
     }
 

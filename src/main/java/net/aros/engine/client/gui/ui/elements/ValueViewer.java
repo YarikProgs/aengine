@@ -6,7 +6,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.data.TextWrap;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
-import net.aros.engine.client.api.ui.ValueUIElementProviders;
+import net.aros.engine.client.api.ui.ValuesUIProviders;
 import net.aros.engine.client.gui.ui.ValuesUI;
 import net.aros.engine.common.api.value.Value;
 import net.aros.engine.common.init.AeRegistries;
@@ -82,7 +82,7 @@ public class ValueViewer extends UIElement {
         typeLabel.setText(Objects.requireNonNull(AeRegistries.VALUE_TYPE.getKey(value.type())).toString());
         valueHolder.clearAllChildren();
 
-        var element = ValueUIElementProviders
+        var element = ValuesUIProviders
                 .getProvider(value.type())
                 .create(value, this::setValueOnServer);
         valueHolder.addChild(element);

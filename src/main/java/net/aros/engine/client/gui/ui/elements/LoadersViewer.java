@@ -81,9 +81,9 @@ public class LoadersViewer extends StorageDependentUIElement {
         addChild(content);
 
         scrollerView.clearAllScrollViewChildren();
-        metadata.loadersMetadata().forEach((key, loaderMetadata) -> {
-            scrollerView.addScrollViewChild(createScrollViewChild(key, loaderMetadata));
-        });
+        metadata.loadersMetadata().forEach((key, loaderMetadata) ->
+                scrollerView.addScrollViewChild(createScrollViewChild(key, loaderMetadata))
+        );
     }
 
     @Contract(pure = true)

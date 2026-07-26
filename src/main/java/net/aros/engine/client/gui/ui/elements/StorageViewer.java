@@ -10,7 +10,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvent;
 import dev.vfyjxf.taffy.style.FlexDirection;
-import net.aros.engine.client.api.ui.StorageTypeUIElementProviders;
+import net.aros.engine.client.api.ui.StorageUIProviders;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.ui.util.AeColors;
 import net.aros.engine.client.gui.ui.util.StorageDependentUIElement;
@@ -143,7 +143,7 @@ public class StorageViewer extends StorageDependentUIElement {
 
         scrollerView.addScrollViewChildren(
                 entries.stream().sorted(Comparator.comparing(StorageEntry::key))
-                        .map(entry -> StorageTypeUIElementProviders.getProvider(entry.value().type()).create(entry))
+                        .map(entry -> StorageUIProviders.getProvider(entry.value().type()).create(entry))
                         .toArray(UIElement[]::new)
         );
         storageEntriesLabel.setText(String.valueOf(entries.size()));

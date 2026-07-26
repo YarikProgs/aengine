@@ -15,10 +15,6 @@ public class ScreenProvider implements ModuleUIProvider {
         this.factory = factory;
     }
 
-    public ScreenProvider(Function<Player, Screen> factory) {
-        this(0, factory);
-    }
-
     @Override
     public int requiredPermission() {
         return requiredPermission;
