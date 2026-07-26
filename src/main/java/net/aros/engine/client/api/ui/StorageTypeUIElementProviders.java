@@ -5,7 +5,6 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.common.api.storage.StorageEntry;
 import net.aros.engine.common.api.storage.type.StorageType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
