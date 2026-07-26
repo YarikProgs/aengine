@@ -3,7 +3,7 @@ package net.aros.engine.common.api.storage;
 import net.aros.engine.common.api.storage.loader.AbstractResourceLoader;
 import net.aros.engine.common.api.storage.metadata.LoaderMetadata;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.storage.type.StorageType;
+import net.aros.engine.common.api.value.ValueType;
 import net.aros.engine.common.storage.StorageManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
@@ -19,11 +19,11 @@ import java.util.concurrent.Executor;
 public abstract class AbstractStorage<T> {
     private final StorageKey<T> key;
     private final Map<ResourceLocation, AbstractResourceLoader<T>> loaders = new HashMap<>();
-    protected final StorageType<T> type;
+    protected final ValueType<T> type;
     private StorageManager storageManager;
     private StorageMetadata metadata;
 
-    protected AbstractStorage(StorageKey<T> key, StorageType<T> type) {
+    protected AbstractStorage(StorageKey<T> key, ValueType<T> type) {
         this.key = key;
         this.type = type;
     }
@@ -31,8 +31,6 @@ public abstract class AbstractStorage<T> {
     public abstract Optional<T> get(ResourceLocation key);
 
     public abstract ResourceLocation getKey(T element);
-
-    public abstract boolean contains(ResourceLocation key);
 
     public abstract Set<StorageEntry<T>> entrySet();
 

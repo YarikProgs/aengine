@@ -1,6 +1,6 @@
 package net.aros.engine.common.api.storage;
 
-import net.aros.engine.common.api.storage.type.StorageType;
+import net.aros.engine.common.api.value.ValueType;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -8,7 +8,7 @@ import java.util.*;
 public class DirectStorage<T> extends AbstractStorage<T> {
     private final Map<ResourceLocation, T> elements = new HashMap<>();
 
-    public DirectStorage(StorageKey<T> key, StorageType<T> type) {
+    public DirectStorage(StorageKey<T> key, ValueType<T> type) {
         super(key, type);
     }
 
@@ -30,14 +30,9 @@ public class DirectStorage<T> extends AbstractStorage<T> {
     public Set<StorageEntry<T>> entrySet() {
         Set<StorageEntry<T>> set = new HashSet<>();
         for (Map.Entry<ResourceLocation, T> entry : elements.entrySet()) {
-            set.add(new StorageEntry<>(type, entry.getKey(), entry.getValue()));
+            set.add(new StorageEntry<>(entry.getKey(), type.create(entry.getValue())));
         }
         return set;
-    }
-
-    @Override
-    public boolean contains(ResourceLocation key) {
-        return elements.containsKey(key);
     }
 
     @Override

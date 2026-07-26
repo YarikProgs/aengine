@@ -85,9 +85,7 @@ public class StorageViewer extends StorageDependentUIElement {
                                 .layout(layout -> layout.marginTop(-2).marginBottom(2))
                                 .addChildren(
                                         new UIElement()
-                                                .layout(layout -> {
-                                                    layout.minWidth(maxComponentWidth + 5 * 2);
-                                                })
+                                                .layout(layout -> layout.minWidth(maxComponentWidth + 5 * 2))
                                                 .addChildren(
                                                         new Label().setText(STATUS)
                                                                 .layout(l -> l.marginBottom(4)),
@@ -96,9 +94,7 @@ public class StorageViewer extends StorageDependentUIElement {
                                                         new Label().setText(ENTRIES)
                                                 ),
                                         new UIElement()
-                                                .layout(layout -> {
-                                                    layout.flex(1);
-                                                })
+                                                .layout(layout -> layout.flex(1))
                                                 .addChildren(
                                                         storageStatusLabel.setText("").layout(l -> l.marginBottom(4)),
                                                         storageLoadTimeLabel.setText("").layout(l -> l.marginBottom(4)),
@@ -108,9 +104,7 @@ public class StorageViewer extends StorageDependentUIElement {
                         new UIElement()
                                 .layout(layout -> layout.flex(1))
                                 .addChildren(
-                                        new UIElement().layout(layout -> {
-                                            layout.flexDirection(FlexDirection.ROW);
-                                        }).addChildren(
+                                        new UIElement().layout(layout -> layout.flexDirection(FlexDirection.ROW)).addChildren(
                                                 new Label().setText(translation("text", "loaded_elements").append(": "))
                                                         .layout(l -> l.flex(1f))
                                         ).addClass("preview_bg"),
@@ -149,7 +143,7 @@ public class StorageViewer extends StorageDependentUIElement {
 
         scrollerView.addScrollViewChildren(
                 entries.stream().sorted(Comparator.comparing(StorageEntry::key))
-                        .map(entry -> StorageTypeUIElementProviders.getProvider(entry.type()).create(entry))
+                        .map(entry -> StorageTypeUIElementProviders.getProvider(entry.value().type()).create(entry))
                         .toArray(UIElement[]::new)
         );
         storageEntriesLabel.setText(String.valueOf(entries.size()));
