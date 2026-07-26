@@ -23,8 +23,9 @@ public abstract class StorageDependentUIElement extends UIElement {
         storageMetadata
                 .bindObserver(this::onStorageMetadataChanged)
                 .bindDataSource(SupplierDataSource.of(() -> (selectedIsClient ? clientInfo : serverInfo).metadata().get(selectedKey)), true);
+        //noinspection rawtypes,unchecked
         storageEntries
-                .bindObserver(this::onStorageContentsChanged)
+                .bindObserver(entries -> onStorageContentsChanged((Set) entries))
                 .bindDataSource(SupplierDataSource.of(() -> (selectedIsClient ? clientInfo : serverInfo).contents().get(selectedKey)));
         addChildren(storageMetadata, storageEntries);
     }
@@ -34,7 +35,7 @@ public abstract class StorageDependentUIElement extends UIElement {
         selectedIsClient = isClient;
     }
 
-    protected abstract void onStorageContentsChanged(Set<StorageEntry<?>> entries);
+    protected abstract <T> void onStorageContentsChanged(Set<StorageEntry<T>> entries);
 
     protected abstract void onStorageMetadataChanged(StorageMetadata selectedStorage);
 }

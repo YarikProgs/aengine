@@ -1,30 +1,28 @@
 package net.aros.engine.client.gui.ui.elements;
 
+import com.lowdragmc.lowdraglib2.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib2.gui.ui.UIElement;
 import com.lowdragmc.lowdraglib2.gui.ui.data.Horizontal;
 import com.lowdragmc.lowdraglib2.gui.ui.data.TextWrap;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import dev.vfyjxf.taffy.style.AlignItems;
+import net.minecraft.network.chat.Component;
 
-import static net.aros.engine.common.ArosEngine.translation;
+public class EmptyStateElement extends UIElement {
+    public final Label label = new Label();
+    public final UIElement image = new UIElement();
 
-public class EmptyStorageStateElement extends UIElement {
-    public EmptyStorageStateElement() {
+    public EmptyStateElement() {
         getLayout().widthPercent(100).heightPercent(100);
         addChildren(
-                new UIElement()
+                image
                         .layout(layout -> {
                             layout.alignSelf(AlignItems.CENTER);
                             layout.flex(0.5f);
                             layout.maxWidthPercent(100);
                             layout.setAspectRatio(1);
-                        })
-                        .style(style -> {
-                            style.backgroundTexture(StorageViewer.CHEST);
-                            style.opacity(1f);
                         }),
-                new Label()
-                        .setText(translation("text", "no_storage"))
+                label
                         .textStyle(textStyle -> {
                             textStyle.textAlignHorizontal(Horizontal.CENTER);
                             textStyle.textShadow(false);
@@ -41,5 +39,15 @@ public class EmptyStorageStateElement extends UIElement {
                             style.color(0xff9b9b9b);
                         })
         );
+    }
+
+    public EmptyStateElement setText(Component text) {
+        label.setText(text);
+        return this;
+    }
+
+    public EmptyStateElement setImage(IGuiTexture texture) {
+        image.getStyle().backgroundTexture(texture);
+        return this;
     }
 }

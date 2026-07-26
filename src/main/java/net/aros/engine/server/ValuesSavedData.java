@@ -1,15 +1,21 @@
 package net.aros.engine.server;
 
+import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
+import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
+import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.value.Value;
 import net.aros.engine.common.api.value.ValueType;
+import net.aros.engine.common.api.value.Values;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -19,10 +25,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class StorageSavedData extends SavedData {
+public class ValuesSavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Factory<StorageSavedData> FACTORY = new Factory<>(StorageSavedData::new, StorageSavedData::readNbt, DataFixTypes.LEVEL);
+    private static final Factory<ValuesSavedData> FACTORY = new Factory<>(ValuesSavedData::new, ValuesSavedData::readNbt, DataFixTypes.LEVEL);
     private final Map<String, Value<?>> values = new HashMap<>();
 
     public <T> Optional<Value<T>> get(String key, ValueType<T> type) {
@@ -54,15 +60,43 @@ public class StorageSavedData extends SavedData {
 
     @Contract("_, _ -> new")
     @NotNull
-    private static StorageSavedData readNbt(@NotNull CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        var data = new StorageSavedData();
+    private static ValuesSavedData readNbt(@NotNull CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        var data = new ValuesSavedData();
         for (String key : nbt.getAllKeys()) {
             data.values.put(key, Value.CODEC.parse(NbtOps.INSTANCE, nbt.get(key)).getOrThrow());
         }
         return data;
     }
 
-    public static @NotNull StorageSavedData of(@NotNull MinecraftServer server) {
+    public static @NotNull ValuesSavedData of(@NotNull MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(FACTORY, ArosEngine.MOD_ID);
+    }
+
+    @RPCPacket("get_value")
+    public static void getValue(RPCSender sender, String receiver, String path) {
+        ServerPlayer player = sender.asPlayer();
+        if (player == null || !player.hasPermissions(2)) return;
+
+        Value<?> value = of(player.server).values.get(path);
+        RPCPacketDistributor.rpcToPlayer(player, receiver, value);
+    }
+
+    @RPCPacket("get_all_values")
+    public static void getAllValues(RPCSender sender, String receiver) {
+        ServerPlayer player = sender.asPlayer();
+        if (player == null || !player.hasPermissions(2)) return;
+
+        var state = of(player.server);
+        RPCPacketDistributor.rpcToPlayer(player, receiver, new Values(state.values));
+    }
+
+    @RPCPacket("set_value")
+    public static void setValue(RPCSender sender, String path, Value<?> value) {
+        ServerPlayer player = sender.asPlayer();
+        if (player == null || !player.hasPermissions(2)) return;
+
+        var savedData = of(player.server);
+        savedData.values.put(path, value);
+        savedData.setDirty();
     }
 }

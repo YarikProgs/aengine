@@ -10,7 +10,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.ScrollerView;
 import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvent;
 import dev.vfyjxf.taffy.style.FlexDirection;
-import net.aros.engine.client.api.ui.StorageTypeUIElementFactories;
+import net.aros.engine.client.api.ui.StorageTypeUIElementProviders;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.ui.util.AeColors;
 import net.aros.engine.client.gui.ui.util.StorageDependentUIElement;
@@ -36,7 +36,9 @@ public class StorageViewer extends StorageDependentUIElement {
     public static final Component ENTRIES = translation("text", "entries").append(": ");
 
     private final UIElement content = new UIElement();
-    private final UIElement emptyContent = new EmptyStorageStateElement();
+    private final UIElement emptyContent = new EmptyStateElement()
+            .setText(translation("text", "no_storage"))
+            .setImage(StorageViewer.CHEST);
     private final Label storageNameLabel = new Label();
     private final Label storageStatusLabel = new Label();
     private final Label storageLoadTimeLabel = new Label();
@@ -98,9 +100,9 @@ public class StorageViewer extends StorageDependentUIElement {
                                                     layout.flex(1);
                                                 })
                                                 .addChildren(
-                                                        storageStatusLabel.layout(l -> l.marginBottom(4)),
-                                                        storageLoadTimeLabel.layout(l -> l.marginBottom(4)),
-                                                        storageEntriesLabel
+                                                        storageStatusLabel.setText("").layout(l -> l.marginBottom(4)),
+                                                        storageLoadTimeLabel.setText("").layout(l -> l.marginBottom(4)),
+                                                        storageEntriesLabel.setText("")
                                                 )
                                 ),
                         new UIElement()
@@ -137,7 +139,7 @@ public class StorageViewer extends StorageDependentUIElement {
     }
 
     @Override
-    protected void onStorageContentsChanged(Set<StorageEntry<?>> entries) {
+    protected <T> void onStorageContentsChanged(Set<StorageEntry<T>> entries) {
         scrollerView.clearAllScrollViewChildren();
 
         if (entries == null || entries.isEmpty()) {
@@ -147,7 +149,7 @@ public class StorageViewer extends StorageDependentUIElement {
 
         scrollerView.addScrollViewChildren(
                 entries.stream().sorted(Comparator.comparing(StorageEntry::key))
-                        .map(StorageTypeUIElementFactories::create)
+                        .map(entry -> StorageTypeUIElementProviders.getProvider(entry.type()).create(entry))
                         .toArray(UIElement[]::new)
         );
         storageEntriesLabel.setText(String.valueOf(entries.size()));

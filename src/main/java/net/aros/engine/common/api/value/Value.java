@@ -2,12 +2,14 @@ package net.aros.engine.common.api.value;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.Objects;
 
 public class Value<T> {
-    public static final Codec<Value<?>> CODEC = ValueType.CODEC
-            .dispatch(Value::type, Value::valueCodecFromType);
+    public static final Codec<Value<?>> CODEC = ValueType.CODEC.dispatch(Value::type, Value::valueCodecFromType);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Value<?>> STREAM_CODEC = ValueType.STREAM_CODEC.dispatch(Value::type, Value::valueStreamCodecFromType);
 
     private final ValueType<T> type;
 
@@ -22,12 +24,8 @@ public class Value<T> {
         return type;
     }
 
-    public T value() {
+    public T get() {
         return value;
-    }
-
-    private static <T> MapCodec<Value<T>> valueCodecFromType(ValueType<T> type) {
-        return type.valueCodec().xmap(type::create, Value::value).fieldOf("value");
     }
 
     @Override
@@ -48,5 +46,13 @@ public class Value<T> {
                 "type=" + type +
                 ", value=" + value +
                 '}';
+    }
+
+    private static <T> StreamCodec<RegistryFriendlyByteBuf, Value<T>> valueStreamCodecFromType(ValueType<T> type) {
+        return type.streamCodec().map(type::create, Value::get);
+    }
+
+    private static <T> MapCodec<Value<T>> valueCodecFromType(ValueType<T> type) {
+        return type.codec().xmap(type::create, Value::get).fieldOf("value");
     }
 }

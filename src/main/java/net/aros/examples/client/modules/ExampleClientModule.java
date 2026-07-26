@@ -4,7 +4,7 @@ import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.DirectStorage;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.systems.CustomStorageSystem;
-import net.aros.examples.common.modules.txt.Txt;
+import net.aros.examples.common.modules.ExampleCommonModule;
 import net.aros.examples.common.modules.txt.TxtLoader;
 
 public class ExampleClientModule implements CustomStorageSystem {
@@ -12,7 +12,7 @@ public class ExampleClientModule implements CustomStorageSystem {
     public void onStorageRegistration(Context ctx) {
         var storage = ctx.registerStorage(new DirectStorage<>(
                 new StorageKey<>(ArosEngine.id("client_txt")),
-                ctx.getStorageType(ArosEngine.id("txt"), Txt.class).orElseThrow()
+                ExampleCommonModule.TXT_TYPE
         ));
 
         storage.attachLoader(new TxtLoader(ArosEngine.id("client_dir_2"), 2));

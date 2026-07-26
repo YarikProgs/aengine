@@ -22,7 +22,9 @@ import static net.aros.engine.common.ArosEngine.translation;
 
 public class LoadersViewer extends StorageDependentUIElement {
     private final UIElement content = new UIElement();
-    private final UIElement emptyContent = new EmptyStorageStateElement();
+    private final UIElement emptyContent = new EmptyStateElement()
+            .setText(translation("text", "no_storage"))
+            .setImage(StorageViewer.CHEST);
     private final ScrollerView scrollerView = new ScrollerView();
 
     public LoadersViewer(
@@ -65,7 +67,7 @@ public class LoadersViewer extends StorageDependentUIElement {
     }
 
     @Override
-    protected void onStorageContentsChanged(Set<StorageEntry<?>> entries) {
+    protected <T> void onStorageContentsChanged(Set<StorageEntry<T>> entries) {
     }
 
     @Override

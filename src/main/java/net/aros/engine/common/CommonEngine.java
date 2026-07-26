@@ -6,7 +6,7 @@ import net.aros.engine.common.storage.ServerStorageUISessionManager;
 import net.aros.engine.common.storage.StorageManager;
 import net.aros.engine.common.systems.CustomStorageSystem;
 import net.aros.engine.common.systems.ServerTickSystem;
-import net.aros.engine.server.StorageSavedData;
+import net.aros.engine.server.ValuesSavedData;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -37,7 +37,7 @@ public class CommonEngine {
     }
 
     private void serverStarted(MinecraftServer server) {
-        valueAccess = ValueAccess.wrap(StorageSavedData.of(server));
+        valueAccess = ValueAccess.wrap(ValuesSavedData.of(server));
     }
 
     public void serverTick(MinecraftServer server) {

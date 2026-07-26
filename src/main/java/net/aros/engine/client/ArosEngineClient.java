@@ -2,6 +2,7 @@ package net.aros.engine.client;
 
 import net.aros.engine.client.init.AeKeybinds;
 import net.aros.engine.client.init.AeLdlibTypes;
+import net.aros.engine.client.init.AeValueUIProviders;
 import net.aros.engine.client.modules.EngineUIsModule;
 import net.aros.engine.common.ArosEngine;
 import net.aros.examples.client.ArosEngineClientExamples;
@@ -14,6 +15,7 @@ public final class ArosEngineClient {
 
     public ArosEngineClient() {
         AeKeybinds.init();
+        AeValueUIProviders.init();
         AeLdlibTypes.init();
 
         engine = new ClientEngine();
