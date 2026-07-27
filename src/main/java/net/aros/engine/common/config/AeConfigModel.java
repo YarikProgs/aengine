@@ -1,9 +1,7 @@
 package net.aros.engine.common.config;
 
-import io.wispforest.owo.config.annotation.Config;
-import io.wispforest.owo.config.annotation.Modmenu;
-import io.wispforest.owo.config.annotation.Nest;
-import io.wispforest.owo.config.annotation.SectionHeader;
+import io.wispforest.owo.config.Option;
+import io.wispforest.owo.config.annotation.*;
 import net.neoforged.fml.loading.FMLLoader;
 
 import static net.aros.engine.common.ArosEngine.MOD_ID;
@@ -13,17 +11,15 @@ import static net.aros.engine.common.ArosEngine.MOD_ID;
 @SuppressWarnings("unused")
 public class AeConfigModel {
     @SectionHeader("common")
-    @Nest
-    public Debug debug = new Debug();
+    @Nest public Debug debug = new Debug();
 
     @SectionHeader("client")
-    @Nest
-    public Colors colors = new Colors();
-    @Nest
-    public StorageUI storageUI = new StorageUI();
+    @Nest public Colors colors = new Colors();
+    @Nest public StorageUI storageUI = new StorageUI();
 
     public static class Debug {
-        public boolean examplesEnabled = !FMLLoader.isProduction();
+        @Sync(Option.SyncMode.OVERRIDE_CLIENT)
+        @RestartRequired public boolean examplesEnabled = !FMLLoader.isProduction();
     }
 
     public static class StorageUI {
@@ -32,8 +28,8 @@ public class AeConfigModel {
     }
 
     public static class Colors {
-        public String softGreen  = "#FFA8FCA4";
-        public String softYellow = "#FFF3FCA4";
-        public String softRed    = "#FFFCA4A4";
+        @RestartRequired public String softGreen  = "#FFA8FCA4";
+        @RestartRequired public String softYellow = "#FFF3FCA4";
+        @RestartRequired public String softRed    = "#FFFCA4A4";
     }
 }
