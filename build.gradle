@@ -38,6 +38,10 @@ repositories {
 dependencies {
     implementation "com.lowdragmc.ldlib2:ldlib2-neoforge-${rootProject.minecraft_version}:${rootProject.ldlib2_version}:all"
     implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:$rootProject.ffa_version+$rootProject.minecraft_version"
+
+    annotationProcessor implementation("io.wispforest:owo-lib-neoforge:${rootProject.owo_version}")
+    accessTransformers "io.wispforest:owo-lib-neoforge:${rootProject.owo_version}"
+    interfaceInjectionData "io.wispforest:owo-lib-neoforge:${rootProject.owo_version}"
 }
 
 base {

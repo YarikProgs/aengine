@@ -1,6 +1,7 @@
 package net.aros.engine.common;
 
 import com.mojang.logging.LogUtils;
+import net.aros.engine.common.config.AeConfig;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.init.AeValueTypes;
 import net.aros.examples.common.ArosEngineExamples;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 public final class ArosEngine {
     public static final String MOD_ID = "aengine";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final AeConfig CONFIG = AeConfig.createAndLoad();
 
     private static CommonEngine engine;
 
@@ -29,8 +31,7 @@ public final class ArosEngine {
         engine = new CommonEngine();
         engine.initialize();
 
-        //noinspection ConstantValue TODO replace with config entry
-        if (true) {
+        if (CONFIG.debug.examplesEnabled()) {
             new ArosEngineExamples();
         }
     }

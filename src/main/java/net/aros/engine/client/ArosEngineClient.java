@@ -22,8 +22,7 @@ public final class ArosEngineClient {
         engine.initializeClient();
         engine.register(new EngineUIsModule());
 
-        //noinspection ConstantValue TODO replace with config entry
-        if (true) {
+        if (ArosEngine.CONFIG.debug.examplesEnabled()) {
             new ArosEngineClientExamples();
         }
     }

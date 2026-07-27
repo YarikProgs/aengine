@@ -23,6 +23,19 @@
   "load_status.aengine.fail": "Fail",
   "load_status.aengine.reloading": "Reloading...",
 
+  "text.config.aengine.title": "Aros' Engine",
+  "text.config.aengine.section.common": "Common",
+  "text.config.aengine.category.debug": "Debug",
+  "text.config.aengine.option.debug.examplesEnabled": "Examples",
+  "text.config.aengine.section.client": "Client",
+  "text.config.aengine.category.colors": "Colors",
+  "text.config.aengine.option.colors.softGreen": "Soft Green",
+  "text.config.aengine.option.colors.softYellow": "Soft Yellow",
+  "text.config.aengine.option.colors.softRed": "Soft Red",
+  "text.config.aengine.category.storageUI": "Storage UI",
+  "text.config.aengine.option.storageUI.okTimeThresholdMs": "'OK' time threshold (in ms)",
+  "text.config.aengine.option.storageUI.warnTimeThresholdMs": "'Warn' time threshold (in ms)",
+
 
   "storage.aengine.txt": "TXTs"
 }
