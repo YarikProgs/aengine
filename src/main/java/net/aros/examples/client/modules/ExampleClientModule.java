@@ -1,0 +1,21 @@
+package net.aros.examples.client.modules;
+
+import net.aros.engine.common.ArosEngine;
+import net.aros.engine.common.api.storage.DirectStorage;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.systems.CustomStorageSystem;
+import net.aros.examples.common.modules.ExampleCommonModule;
+import net.aros.examples.common.modules.txt.TxtLoader;
+import org.jetbrains.annotations.NotNull;
+
+public class ExampleClientModule implements CustomStorageSystem {
+    @Override
+    public void onStorageRegistration(@NotNull Context ctx) {
+        var storage = ctx.registerStorage(new DirectStorage<>(
+                new StorageKey<>(ArosEngine.id("client_txt")),
+                ExampleCommonModule.TXT_TYPE
+        ));
+
+        storage.attachLoader(new TxtLoader(ArosEngine.id("client_dir_2"), 2));
+    }
+}

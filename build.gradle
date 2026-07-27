@@ -1,74 +1,96 @@
 plugins {
-    id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'com.gradleup.shadow' version '8.3.6' apply false
+    id 'dev.architectury.loom' version '1.11-SNAPSHOT'
+    id 'com.gradleup.shadow' version '8.3.6'
+    id 'java-library'
+    id 'maven-publish'
 }
 
-architectury {
-    minecraft = project.minecraft_version
+group = rootProject.maven_group
+version = rootProject.mod_version
+
+base {
+    archivesName = rootProject.archives_name
 }
 
-allprojects {
-    group = rootProject.maven_group
-    version = rootProject.mod_version
+repositories {
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+
+    maven {
+        url "https://maven.su5ed.dev/releases"
+    }
+
+    maven {
+        name = "FirstDark"
+        url = uri("https://maven.firstdark.dev/snapshots")
+    }
 }
 
-subprojects {
-    apply plugin: 'dev.architectury.loom'
-    apply plugin: 'architectury-plugin'
-    apply plugin: 'maven-publish'
+loom {
+    silentMojangMappingsLicense()
+}
 
-    base {
-        // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
-        archivesName = "$rootProject.archives_name-$project.name"
+dependencies {
+    minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$rootProject.minecraft_version:$rootProject.parchment_version@zip")
+    }
+    neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
+
+    modImplementation "com.lowdragmc.ldlib2:ldlib2-neoforge-${rootProject.minecraft_version}:${rootProject.ldlib2_version}:all"
+
+    modImplementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:$rootProject.fabric_api_version+$rootProject.ffa_version+$rootProject.minecraft_version"
+
+    minecraftRuntimeLibraries "org.appliedenergistics.yoga:yoga:${rootProject.yoga_version}"
+    minecraftRuntimeLibraries "dev.vfyjxf:taffy:${rootProject.taffy_version}"
+}
+
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand version: inputs.properties.version
+    }
+}
+
+jar {
+    from("LICENSE") {
+        rename {
+            "${it}_${project.base.archivesName}"
+        }
+    }
+}
+
+// Configure Maven publishing.
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.base.archivesName.toString()
+            version = project.version.toString()
+
+            artifact jar
+            artifact remapJar
+            artifact sourcesJar
+        }
     }
 
     repositories {
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
-    }
 
-    loom {
-        silentMojangMappingsLicense()
-    }
-
-    dependencies {
-        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
-        mappings loom.officialMojangMappings()
-    }
-
-    java {
-        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-        // if it is present.
-        // If you remove this line, sources will not be generated.
-        withSourcesJar()
-
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21
-    }
-
-    // Configure Maven publishing.
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
-                from components.java
-            }
-        }
-
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-        repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
-        }
     }
 }

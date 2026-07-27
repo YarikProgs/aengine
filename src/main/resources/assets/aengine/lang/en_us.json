@@ -1,0 +1,28 @@
+{
+  "view.aengine.storages": "Storages",
+  "view.aengine.content": "Content",
+  "view.aengine.loaders": "Loaders",
+  "view.aengine.value_explorer": "Value Explorer",
+  "view.aengine.value": "Value",
+  "text.aengine.client": "Client",
+  "text.aengine.server": "Server",
+  "text.aengine.no_storage": "Nobody here but us chickens!",
+  "text.aengine.no_value": "Nobody here but us chickens!",
+  "text.aengine.storage": "Storage",
+  "text.aengine.status": "Status",
+  "text.aengine.load_time": "Load time",
+  "text.aengine.entries": "Entries",
+  "text.aengine.key": "Key",
+  "text.aengine.action": "Action",
+  "text.aengine.reload": "Reload",
+  "text.aengine.reloading": "Reloading...",
+  "text.aengine.loaded_elements": "Loaded elements",
+  "text.aengine.reload_storage": "Reload storage",
+  "text.aengine.send": "Send",
+  "load_status.aengine.ok": "OK",
+  "load_status.aengine.fail": "Fail",
+  "load_status.aengine.reloading": "Reloading...",
+
+
+  "storage.aengine.txt": "TXTs"
+}
