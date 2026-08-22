@@ -1,6 +1,7 @@
 package net.aros.engine.common.api.storage;
 
 import net.aros.engine.common.api.storage.loader.AbstractResourceLoader;
+import net.aros.engine.common.api.storage.event.StorageReloadEvent;
 import net.aros.engine.common.api.storage.metadata.LoaderMetadata;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.aros.engine.common.api.value.ValueType;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -35,6 +37,12 @@ public abstract class AbstractStorage<T> {
     public abstract Set<StorageEntry<T>> entrySet();
 
     protected abstract void replaceWith(Map<ResourceLocation, T> contents);
+
+    protected void beforeReload() {
+    }
+
+    protected void afterReload() {
+    }
 
     public StorageKey<T> getKey() {
         return key;
@@ -81,29 +89,50 @@ public abstract class AbstractStorage<T> {
         @Override
         @ParametersAreNonnullByDefault
         public @NotNull CompletableFuture<Void> reload(
-                PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller,
-                ProfilerFiller profilerFiller2, Executor executor, Executor executor2
+                PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler,
+                ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor
         ) {
-            List<CompletableFuture<Map<ResourceLocation, T>>> futures = new ArrayList<>();
-            for (AbstractResourceLoader<T> loader : loaders.values()) {
-                loader.markReloadStart();
-                futures.add(loader.parseAll(resourceManager));
-            }
-            createAndSendMetadata();
-            sendContent();
-
             return CompletableFuture
-                    .allOf(futures.toArray(CompletableFuture[]::new))
-                    .thenCompose(preparationBarrier::wait)
-                    .thenAccept(v -> {
-                        Map<ResourceLocation, T> result = new HashMap<>();
-                        for (var future : futures) {
-                            result.putAll(future.join()); // Already completed
+                    .supplyAsync(() -> {
+                        List<AbstractResourceLoader<T>> activeLoaders = List.copyOf(loaders.values());
+                        for (AbstractResourceLoader<T> loader : activeLoaders) {
+                            loader.markReloadStart();
                         }
+
+                        beforeReload();
+                        NeoForge.EVENT_BUS.post(new StorageReloadEvent.Before(AbstractStorage.this));
+                        createAndSendMetadata();
+                        sendContent();
+
+                        return activeLoaders;
+                    }, gameExecutor)
+                    .thenCompose(activeLoaders -> {
+                        List<CompletableFuture<Map<ResourceLocation, T>>> futures = new ArrayList<>();
+                        for (AbstractResourceLoader<T> loader : activeLoaders) {
+                            futures.add(CompletableFuture.supplyAsync(
+                                    () -> loader.parseAll(resourceManager),
+                                    backgroundExecutor
+                            ));
+                        }
+
+                        return CompletableFuture
+                                .allOf(futures.toArray(CompletableFuture[]::new))
+                                .thenApplyAsync(v -> {
+                                    Map<ResourceLocation, T> result = new HashMap<>();
+                                    for (var future : futures) {
+                                        result.putAll(future.join()); // Already completed
+                                    }
+                                    return result;
+                                }, backgroundExecutor);
+                    })
+                    .thenCompose(preparationBarrier::wait)
+                    .thenAcceptAsync(result -> {
                         replaceWith(result);
                         createAndSendMetadata();
                         sendContent();
-                    });
+                        NeoForge.EVENT_BUS.post(new StorageReloadEvent.After(AbstractStorage.this));
+                        afterReload();
+                    }, gameExecutor);
         }
     }
 }

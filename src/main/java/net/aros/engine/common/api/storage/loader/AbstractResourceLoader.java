@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractResourceLoader<T> {
@@ -36,29 +35,27 @@ public abstract class AbstractResourceLoader<T> {
     public abstract DataResult<T> parse(ResourceLocation path, Resource resource) throws Exception;
 
     @Contract("_ -> new")
-    public final @NotNull CompletableFuture<Map<ResourceLocation, T>> parseAll(@NotNull ResourceManager manager) {
-        return CompletableFuture.supplyAsync(() -> {
-            LoadStatus[] status = { LoadStatus.OK };
-            Map<ResourceLocation, T> parsed = new HashMap<>();
+    public final @NotNull Map<ResourceLocation, T> parseAll(@NotNull ResourceManager manager) {
+        LoadStatus[] status = { LoadStatus.OK };
+        Map<ResourceLocation, T> parsed = new HashMap<>();
 
-            long startTime = System.nanoTime();
-            var resources = manager.listResources(path, loc
-                    -> loc.getPath().endsWith('.' + fileExtension));
-            resources.forEach((path, resource) -> {
-                var result = tryParse(path, resource);
-                if (result.isError()) {
-                    status[0] = LoadStatus.FAIL;
-                    LOGGER.warn("({}) Failed to load element '{}': {}", key, path, result.error().orElseThrow().message());
-                    return;
-                }
-                var value = result.getOrThrow();
-                parsed.put(keyFactory.getKeyOf(path, value), value);
-            });
-
-            metadata = new LoaderMetadata(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime), status[0]);
-
-            return parsed;
+        long startTime = System.nanoTime();
+        var resources = manager.listResources(path, loc
+                -> loc.getPath().endsWith('.' + fileExtension));
+        resources.forEach((path, resource) -> {
+            var result = tryParse(path, resource);
+            if (result.isError()) {
+                status[0] = LoadStatus.FAIL;
+                LOGGER.warn("({}) Failed to load element '{}': {}", key, path, result.error().orElseThrow().message());
+                return;
+            }
+            var value = result.getOrThrow();
+            parsed.put(keyFactory.getKeyOf(path, value), value);
         });
+
+        metadata = new LoaderMetadata(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime), status[0]);
+
+        return parsed;
     }
 
     private DataResult<T> tryParse(ResourceLocation pathKey, Resource resource) {

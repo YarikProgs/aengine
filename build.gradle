@@ -1,8 +1,46 @@
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
 plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.142'
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'idea'
+}
+
+abstract class CopyKotlinScriptingDepsTask extends DefaultTask {
+    @Classpath
+    abstract ConfigurableFileCollection getLibraries()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDirectory()
+
+    @TaskAction
+    void copyLibraries() {
+        File output = outputDirectory.get().asFile
+        Files.createDirectories(output.toPath())
+
+        File[] existingFiles = output.listFiles()
+        if (existingFiles != null) {
+            for (File file : existingFiles) {
+                if (file.isFile()) {
+                    Files.deleteIfExists(file.toPath())
+                }
+            }
+        }
+
+        List<File> jars = libraries.files.findAll { File file ->
+            file.name.endsWith(".jar")
+        }.sort { File file -> file.name }
+
+        for (File jar : jars) {
+            Files.copy(jar.toPath(), output.toPath().resolve(jar.name), StandardCopyOption.REPLACE_EXISTING)
+        }
+
+        Files.write(output.toPath().resolve("index.txt"), jars.collect { File jar -> jar.name }, StandardCharsets.UTF_8)
+    }
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -19,7 +57,71 @@ sourceSets.main.resources {
     exclude("src/generated/**/.cache")
 }
 
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+kotlin {
+    jvmToolchain(21)
+}
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            jvmArguments.addAll '-XX:+AllowEnhancedClassRedefinition'
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+            logLevel = org.slf4j.event.Level.INFO
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+
+    kotlinScripting
+}
+
 repositories {
+    mavenCentral()
+    mavenLocal() // TODO: replace with actual maven
+
     maven {
         url "https://maven.su5ed.dev/releases"
     }
@@ -42,60 +144,20 @@ dependencies {
     annotationProcessor implementation("io.wispforest:owo-lib-neoforge:${rootProject.owo_version}")
     accessTransformers "io.wispforest:owo-lib-neoforge:${rootProject.owo_version}"
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:${rootProject.owo_version}"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.kotlin_version}"
+    kotlinScripting "org.jetbrains.kotlin:kotlin-scripting-jvm-host:${rootProject.kotlin_version}"
+    kotlinScripting "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.kotlin_version}"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+
+    implementation "net.aros:canon-neoforge:1.0.1"
 }
 
-base {
-    archivesName = mod_id
-}
+def kotlinScriptingLibsDir = layout.projectDirectory.dir("src/main/resources/kotlin-scripting-libs")
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-neoForge {
-    version = project.neo_version
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
-
-    runs {
-        client {
-            client()
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        server {
-            server()
-            programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        gameTestServer {
-            type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        }
-
-        data {
-            data()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-
-            logLevel = org.slf4j.event.Level.DEBUG
-        }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet(sourceSets.main)
-        }
-    }
-}
-
-configurations {
-    runtimeClasspath.extendsFrom localRuntime
+tasks.register("copyKotlinScriptingDeps", CopyKotlinScriptingDepsTask) {
+    libraries.from(configurations.kotlinScripting)
+    outputDirectory.set(kotlinScriptingLibsDir)
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

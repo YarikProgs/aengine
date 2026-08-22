@@ -98,7 +98,7 @@ public class StorageViewer extends StorageDependentUIElement {
                                                 .addChildren(
                                                         storageStatusLabel.setText("").layout(l -> l.marginBottom(4)),
                                                         storageLoadTimeLabel.setText("").layout(l -> l.marginBottom(4)),
-                                                        storageEntriesLabel.setText("")
+                                                        storageEntriesLabel.setText("0")
                                                 )
                                 ),
                         new UIElement()

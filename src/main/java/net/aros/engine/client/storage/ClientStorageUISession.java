@@ -21,7 +21,10 @@ public class ClientStorageUISession {
 
     @RPCPacket("session.storageui.receive_initial_data")
     public static void receiveInitialInfo(InitialData initialData) {
-        getCurrentStorageUI().ifPresent(ui -> ui.putAllMetadata(initialData.metadataMap(), false));
+        getCurrentStorageUI().ifPresent(ui -> {
+            ui.putAllMetadata(initialData.metadataMap(), false);
+            ui.putAllContents(initialData.contentsList(), false);
+        });
     }
 
     @RPCPacket("session.storageui.receive_content")

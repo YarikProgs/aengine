@@ -22,6 +22,10 @@
   "load_status.aengine.ok": "OK",
   "load_status.aengine.fail": "Fail",
   "load_status.aengine.reloading": "Reloading...",
+  "commands.aengine.scriptal.execute.success": "Executed script %s",
+  "commands.aengine.scriptal.execute.not_found": "Script %s was not found",
+  "commands.aengine.scriptal.execute.failed": "Script %s failed: %s",
+  "commands.aengine.scriptal.execute.storage_unavailable": "Script storage is not available",
 
   "text.config.aengine.title": "Aros' Engine",
   "text.config.aengine.section.common": "Common",

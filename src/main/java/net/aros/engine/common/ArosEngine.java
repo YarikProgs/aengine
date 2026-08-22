@@ -1,14 +1,19 @@
 package net.aros.engine.common;
 
 import com.mojang.logging.LogUtils;
+import net.aros.engine.common.api.script.AeScriptApi;
+import net.aros.engine.common.command.AEngineCommand;
 import net.aros.engine.common.config.AeConfig;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.init.AeValueTypes;
+import net.aros.engine.common.script.AeScriptSystem;
 import net.aros.examples.common.ArosEngineExamples;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +35,10 @@ public final class ArosEngine {
 
         engine = new CommonEngine();
         engine.initialize();
+        engine.register(new AeScriptSystem());
+
+        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, e -> AEngineCommand.register(e.getDispatcher()));
+        AeScriptApi.initialize();
 
         if (CONFIG.debug.examplesEnabled()) {
             new ArosEngineExamples();

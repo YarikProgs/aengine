@@ -118,7 +118,7 @@ public class ValueTreeList extends TreeList<ValueTreeNode> {
             return container.layout(l -> l.flex(1));
         }
 
-        // todo: menu on click. not mvp on 26.07.26 :(
+        // todo: menu net.aros.engine.script.on click. not mvp net.aros.engine.script.on 26.07.26 :(
 //        private void nodeClick(UIEvent event, @NotNull ValueTreeNode node) {
 //            if (event.button != GLFW.GLFW_MOUSE_BUTTON_RIGHT) return;
 //

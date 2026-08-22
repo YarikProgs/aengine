@@ -43,12 +43,12 @@ public class Value<T> {
     @Override
     public String toString() {
         return "Value{" +
-                "type=" + type +
+                "contextType=" + type +
                 ", value=" + value +
                 '}';
     }
 
-    private static <T> StreamCodec<RegistryFriendlyByteBuf, Value<T>> valueStreamCodecFromType(ValueType<T> type) {
+    private static <T> StreamCodec<? super RegistryFriendlyByteBuf, Value<T>> valueStreamCodecFromType(ValueType<T> type) {
         return type.streamCodec().map(type::create, Value::get);
     }
 
