@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package net.aros.engine.script
+package net.aros.engine.api.script
 
 import net.aros.canon.event.custom.StateRegistrationEvent
 import net.aros.engine.common.api.script.AeScriptApi

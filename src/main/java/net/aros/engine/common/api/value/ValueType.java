@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public record ValueType<T>(Codec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec) {
+public record ValueType<T>(Codec<T> codec, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
     public static final Codec<ValueType<?>> CODEC = AeRegistries.VALUE_TYPE.byNameCodec();
     public static final StreamCodec<RegistryFriendlyByteBuf, ValueType<?>> STREAM_CODEC = ByteBufCodecs.registry(AeRegistries.VALUE_TYPE_KEY);
 

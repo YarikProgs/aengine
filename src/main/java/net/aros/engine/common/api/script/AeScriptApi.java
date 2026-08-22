@@ -10,12 +10,14 @@ import net.aros.engine.common.api.script.callables.GlobalCall;
 import net.aros.engine.common.api.script.callables.PlayerCall;
 import net.aros.engine.common.api.script.callables.commandcodecs.CommandCodec;
 import net.aros.engine.common.api.script.compilation.AeScript;
+import net.aros.engine.common.api.storage.StorageEntry;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -66,10 +68,10 @@ public class AeScriptApi {
         CALLABLES.clear();
     }
 
-    public static void runScripts(@NotNull Map<ResourceLocation, AeScript> scripts) {
-        scripts.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEach(entry -> runScript(entry.getKey(), entry.getValue()));
+    public static void runScripts(Set<StorageEntry<AeScript>> scripts) {
+        scripts.stream()
+                .sorted(Comparator.comparing(StorageEntry::key))
+                .forEach(entry -> runScript(entry.key(), entry.value().get()));
     }
 
     private static void runScript(ResourceLocation id, Runnable script) {

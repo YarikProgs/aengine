@@ -1,4 +1,4 @@
-package net.aros.engine.script
+package net.aros.engine.api.script
 
 import net.aros.canon.core.Can
 import net.aros.canon.core.state.StateKey
@@ -22,7 +22,8 @@ class StatesRegistrationDsl(
 class StateRegistrationDsl<S, T>(
     private val registration: StateRegistration<S, T>
 ) {
-    val server = Can.server()
+    inline val server
+        get() = Can.server()
 
     fun listen(listener: ChangeEvent<S, T>) {
         registration.addChangeListener(listener)
