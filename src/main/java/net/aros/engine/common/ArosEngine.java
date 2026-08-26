@@ -11,6 +11,7 @@ import net.aros.examples.common.ArosEngineExamples;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -27,7 +28,7 @@ public final class ArosEngine {
 
     private static CommonEngine engine;
 
-    public ArosEngine() {
+    public ArosEngine(IEventBus bus) {
         LOGGER.info("Aros' Engine is initializing...");
 
         AeRegistries.touch();
@@ -41,7 +42,7 @@ public final class ArosEngine {
         AeScriptApi.initialize();
 
         if (CONFIG.debug.examplesEnabled()) {
-            new ArosEngineExamples();
+            new ArosEngineExamples(bus);
         }
     }
 
