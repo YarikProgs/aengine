@@ -1,23 +1,28 @@
 package net.aros.examples.common;
 
-import net.aros.engine.client.api.camera.AeCameras;
-import net.aros.engine.client.api.camera.position.PositionInterpolation;
-import net.aros.engine.client.api.camera.settings.EntityCameraSettings;
-import net.aros.engine.client.api.camera.rotation.RotationMode;
 import net.aros.engine.common.ArosEngine;
-import net.aros.examples.common.modules.ExampleCommonModule;
+import net.aros.engine.common.api.storage.AbstractStorage;
+import net.aros.engine.common.api.storage.DirectStorage;
+import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.api.value.ValueType;
+import net.aros.engine.common.events.RegisterServerStorageEvent;
+import net.aros.engine.common.init.AeRegistries;
+import net.aros.engine.common.script.procedure.Procedures;
+import net.aros.examples.common.modules.txt.Txt;
+import net.aros.examples.common.modules.txt.TxtLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3f;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -27,8 +32,20 @@ public class ArosEngineExamples {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
     private static final DeferredItem<TestItem> TEST_ITEM = ITEMS.registerItem("test_item", TestItem::new);
 
+    public static final ValueType<Txt> TXT_TYPE = Registry.register(AeRegistries.VALUE_TYPE,
+            ArosEngine.id("txt"), new ValueType<>(Txt.CODEC, Txt.STREAM_CODEC));
+
+    public static final AbstractStorage<Txt> TXT_STORAGE = new DirectStorage<>(
+            new StorageKey<>(ArosEngine.id("txt")),
+            TXT_TYPE
+    )
+            .attachLoader(new TxtLoader(ArosEngine.id("dir_0"), 0))
+            .attachLoader(new TxtLoader(ArosEngine.id("dir_1"), 1));
+
     public ArosEngineExamples(IEventBus bus) {
-        ArosEngine.getEngine().register(new ExampleCommonModule());
+        NeoForge.EVENT_BUS.addListener(RegisterServerStorageEvent.class, event -> {
+            event.register(TXT_STORAGE);
+        });
 
         ITEMS.register(bus);
     }
@@ -42,18 +59,20 @@ public class ArosEngineExamples {
         @ParametersAreNonnullByDefault
         @NotNull
         public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-            if (level.isClientSide && usedHand == InteractionHand.MAIN_HAND) {
-                if (player.isShiftKeyDown()) AeCameras.reset();
-                else AeCameras.setEntity(player, new EntityCameraSettings(
-                        new Vec3(0.0D, 10.0D, -2.0D),
-                        new Vector3f(0, 0, 0),
-                        EntityCameraSettings.OffsetSpace.ENTITY,
-                        PositionInterpolation.linear(0.1f),
-                        RotationMode.lookAtTarget(0.6f, true),
-                        true,
-                        true,
-                        true
-                ));
+            if (!level.isClientSide && usedHand == InteractionHand.MAIN_HAND) {
+//                if (player.isShiftKeyDown()) AeCameras.reset();
+//                else AeCameras.setEntity(player, new EntityCameraSettings(
+//                        new Vec3(0.0D, 10.0D, -2.0D),
+//                        new Vector3f(0, 0, 0),
+//                        EntityCameraSettings.OffsetSpace.ENTITY,
+//                        PositionInterpolation.linear(0.1f),
+//                        RotationMode.lookAtTarget(0.6f, true),
+//                        true,
+//                        true,
+//                        true
+//                ));
+
+                Procedures.call(ResourceLocation.fromNamespaceAndPath("mymod", "diamonds/set_allowed"), player, player.isShiftKeyDown());
 
 //else                 AeCameras.setMoving(
 //                        List.of(

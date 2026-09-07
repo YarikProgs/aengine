@@ -1,23 +1,148 @@
-@file:Suppress("NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
 
 package net.aros.engine.api.script
 
 import net.aros.canon.event.custom.StateRegistrationEvent
-import net.aros.engine.common.api.script.AeScriptApi
-import net.aros.engine.common.api.script.callables.CallContext
+import net.aros.engine.common.network.ProcedureCallPayload
+import net.aros.engine.common.script.events.EventSubscriptions
+import net.aros.engine.common.script.procedure.Procedure
+import net.aros.engine.common.script.procedure.Procedures
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.ChunkPos
 import net.neoforged.bus.api.Event
+import net.neoforged.neoforge.network.PacketDistributor
+import net.neoforged.neoforge.server.ServerLifecycleHooks
+import org.jetbrains.annotations.ApiStatus
+import kotlin.reflect.KClass
 
 inline fun <reified T : Event> on(noinline body: T.() -> Unit) {
-    AeScriptApi.subscribeNeoForgeEvent(T::class.java, body)
+    EventSubscriptions.subscribe(T::class.java, body)
 }
 
 inline fun onStateRegistration(noinline body: StatesRegistrationDsl.() -> Unit) {
     on<StateRegistrationEvent> {
-        body(StatesRegistrationDsl(this))
+        return@on body(StatesRegistrationDsl(this))
     }
 }
 
-inline fun <reified T : CallContext> callable(id: ResourceLocation, noinline body: T.() -> Unit) {
-    AeScriptApi.addCallable(T::class.java, id, body)
+inline fun <reified R : Any> call(id: ResourceLocation, vararg args: Any) =
+    Procedures.call(id, args) as? R
+
+inline fun callClient(body: ClientCall.() -> Unit) =
+    body(ClientCall)
+
+@ApiStatus.Internal
+fun addProc(id: ResourceLocation, vararg parameterTypes: KClass<out Any>, body: (args: Array<Any>) -> Any) =
+    Procedures.add(Procedure(id, parameterTypes.map { it.javaObjectType }.toTypedArray(), body))
+
+inline fun <R : Any> proc(id: ResourceLocation, noinline body: () -> R) =
+    addProc(id) { return@addProc body() }
+
+inline fun <reified P1 : Any, R : Any> proc(id: ResourceLocation, noinline body: (P1) -> R) =
+    addProc(id, P1::class) { arguments ->
+        return@addProc body(arguments[0] as P1)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, R : Any> proc(id: ResourceLocation, noinline body: (P1, P2) -> R) =
+    addProc(id, P1::class, P2::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, R : Any> proc(id: ResourceLocation, noinline body: (P1, P2, P3) -> R) =
+    addProc(id, P1::class, P2::class, P3::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, R : Any> proc(id: ResourceLocation, noinline body: (P1, P2, P3, P4) -> R) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, reified P6 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5, P6) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class, P6::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5, arguments[5] as P6)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, reified P6 : Any, reified P7 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5, P6, P7) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class, P6::class, P7::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5, arguments[5] as P6, arguments[6] as P7)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, reified P6 : Any, reified P7 : Any, reified P8 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5, P6, P7, P8) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class, P6::class, P7::class, P8::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5, arguments[5] as P6, arguments[6] as P7, arguments[7] as P8)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, reified P6 : Any, reified P7 : Any, reified P8 : Any, reified P9 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5, P6, P7, P8, P9) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class, P6::class, P7::class, P8::class, P9::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5, arguments[5] as P6, arguments[6] as P7, arguments[7] as P8, arguments[8] as P9)
+    }
+
+inline fun <reified P1 : Any, reified P2 : Any, reified P3 : Any, reified P4 : Any, reified P5 : Any, reified P6 : Any, reified P7 : Any, reified P8 : Any, reified P9 : Any, reified P10 : Any, R : Any> proc(
+    id: ResourceLocation,
+    noinline body: (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) -> R
+) =
+    addProc(id, P1::class, P2::class, P3::class, P4::class, P5::class, P6::class, P7::class, P8::class, P9::class, P10::class) { arguments ->
+        return@addProc body(arguments[0] as P1, arguments[1] as P2, arguments[2] as P3, arguments[3] as P4, arguments[4] as P5, arguments[5] as P6, arguments[6] as P7, arguments[7] as P8, arguments[8] as P9, arguments[9] as P10)
+    }
+
+object ClientCall {
+    inline fun send(id: ResourceLocation, vararg args: Any, crossinline sender: (ProcedureCallPayload) -> Unit) {
+        ServerLifecycleHooks.getCurrentServer()?.let {
+            ProcedureCallPayload.create(it.registryAccess(), id, args).ifPresent {
+                sender(it)
+            }
+        }
+    }
+
+    inline fun allPlayers(id: ResourceLocation, vararg args: Any) = send(id, args = args) {
+        PacketDistributor.sendToAllPlayers(it)
+    }
+
+    inline fun player(player: ServerPlayer, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayer(player, it)
+    }
+
+    inline fun playersInDimension(level: ServerLevel, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayersInDimension(level, it)
+    }
+
+    inline fun playersNear(level: ServerLevel, excluded: ServerPlayer?, x: Double, y: Double, z: Double, radius: Double, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayersNear(level, excluded, x, y, z, radius, it)
+    }
+
+    inline fun playersTrackingChunk(level: ServerLevel, chunkPos: ChunkPos, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayersTrackingChunk(level, chunkPos, it)
+    }
+
+    inline fun playersTrackingEntity(entity: Entity, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayersTrackingEntity(entity, it)
+    }
+
+    inline fun playersTrackingEntityAndSelf(entity: Entity, id: ResourceLocation, vararg args: Any) = send(id, *args) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, it)
+    }
 }

@@ -1,9 +1,7 @@
 package net.aros.engine.common.init;
 
 import com.mojang.serialization.Codec;
-import io.netty.buffer.ByteBuf;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.script.compilation.AeScript;
 import net.aros.engine.common.api.value.ValueType;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +22,6 @@ public class AeValueTypes {
     public static final ValueType<String> STRING = registerFromCodecs("string", Codec.STRING, ByteBufCodecs.STRING_UTF8);
     public static final ValueType<ResourceLocation> RESOURCE_LOCATION = registerFromCodecs("resource_location", ResourceLocation.CODEC, ResourceLocation.STREAM_CODEC);
     public static final ValueType<CompoundTag> COMPOUND_TAG = registerFromCodecs("compound_tag", CompoundTag.CODEC, ByteBufCodecs.COMPOUND_TAG);
-    public static final ValueType<AeScript> SCRIPT = registerFromCodecs("script", AeScript.CODEC, AeScript.STREAM_CODEC.cast());
 
     private static <T> @NotNull ValueType<T> registerFromCodecs(String name, Codec<T> codec, StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
         return Registry.register(AeRegistries.VALUE_TYPE, ArosEngine.id(name), new ValueType<>(codec, streamCodec));

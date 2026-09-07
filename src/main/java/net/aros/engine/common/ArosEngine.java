@@ -1,12 +1,19 @@
 package net.aros.engine.common;
 
+import com.google.common.base.Predicates;
 import com.mojang.logging.LogUtils;
-import net.aros.engine.common.api.script.AeScriptApi;
+import net.aros.engine.client.ArosEngineClient;
+import net.aros.engine.common.api.script.ScriptBackends;
 import net.aros.engine.common.command.AEngineCommand;
 import net.aros.engine.common.config.AeConfig;
+import net.aros.engine.common.init.AeLdlibTypes;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.init.AeValueTypes;
-import net.aros.engine.common.script.AeScriptSystem;
+import net.aros.engine.common.network.ProcedureCallPayload;
+import net.aros.engine.common.script.KotlinScriptBackend;
+import net.aros.engine.common.script.ScriptReloadListener;
+import net.aros.engine.common.script.events.EventSubscriptions;
+import net.aros.engine.common.script.procedure.Procedures;
 import net.aros.examples.common.ArosEngineExamples;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -14,7 +21,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,20 +35,23 @@ public final class ArosEngine {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final AeConfig CONFIG = AeConfig.createAndLoad();
 
-    private static CommonEngine engine;
-
     public ArosEngine(IEventBus bus) {
         LOGGER.info("Aros' Engine is initializing...");
 
         AeRegistries.touch();
         AeValueTypes.touch();
+        AeLdlibTypes.init();
 
-        engine = new CommonEngine();
-        engine.initialize();
-        engine.register(new AeScriptSystem());
-
-        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, e -> AEngineCommand.register(e.getDispatcher()));
-        AeScriptApi.initialize();
+        ScriptBackends.register(KotlinScriptBackend.INSTANCE);
+        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, e
+                -> AEngineCommand.register(e.getDispatcher()));
+        NeoForge.EVENT_BUS.addListener(AddReloadListenerEvent.class, e -> e.addListener(new ScriptReloadListener(
+                () -> {
+                    Procedures.clear();
+                    EventSubscriptions.clear();
+                }, Predicates::alwaysTrue)));
+        bus.addListener(RegisterPayloadHandlersEvent.class, e
+                -> e.registrar("1.0.0").playToClient(ProcedureCallPayload.TYPE, ProcedureCallPayload.STREAM_CODEC, ArosEngineClient::handleProcedureCall));
 
         if (CONFIG.debug.examplesEnabled()) {
             new ArosEngineExamples(bus);
@@ -49,11 +61,6 @@ public final class ArosEngine {
     @Contract("_ -> new")
     public static @NotNull ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
-    }
-
-    public static CommonEngine getEngine() {
-        if (engine == null) throw new IllegalStateException("getEngine call too early");
-        return engine;
     }
 
     @Contract(pure = true)

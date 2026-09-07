@@ -66,7 +66,7 @@ public class ServerStorageUISessionManager implements StorageUISessionManager {
     private void sendInitialDataTo(@NotNull Player player) {
         Map<StorageKey<?>, StorageMetadata> metadataMap = new HashMap<>();
         List<ContentUpdate<?>> contentsList = new ArrayList<>();
-        ArosEngine.getEngine().storageManager().getAll().forEach((key, storage) -> {
+        StorageManager.getAll().forEach((key, storage) -> {
             if (storage.getMetadata() != null)
                 metadataMap.put(key, storage.getMetadata());
             //noinspection unchecked,rawtypes

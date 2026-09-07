@@ -8,8 +8,12 @@ import net.aros.engine.client.camera.EntityCameraMode;
 import net.aros.engine.client.camera.MovingCameraMode;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -20,6 +24,11 @@ public final class AeCameras {
     private static final ClientCameraController CONTROLLER = new ClientCameraController();
 
     private AeCameras() {
+    }
+
+    static {
+        NeoForge.EVENT_BUS.addListener(AeCameras::tick);
+        NeoForge.EVENT_BUS.addListener(AeCameras::onUnload);
     }
 
     public static void set(@NotNull CameraMode mode) {
@@ -66,8 +75,14 @@ public final class AeCameras {
         return CONTROLLER.renderState(camera, partialTick);
     }
 
-    public static void tick(@NotNull Minecraft minecraft) {
-        CONTROLLER.tick(minecraft);
+    private static void tick(@NotNull ClientTickEvent.Post event) {
+        CONTROLLER.tick();
     }
 
+    private static void onUnload(LevelEvent.@NotNull Unload event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (event.getLevel() instanceof ClientLevel && event.getLevel() == minecraft.level) {
+            AeCameras.reset();
+        }
+    }
 }

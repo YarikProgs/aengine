@@ -1,7 +1,7 @@
 package net.aros.engine.client.gui.screen;
 
 import com.mojang.math.Axis;
-import net.aros.engine.client.ArosEngineClient;
+import net.aros.engine.client.api.ModuleUIs;
 import net.aros.engine.client.gui.screen.widets.IconButtonWidget;
 import net.aros.engine.common.ArosEngine;
 import net.minecraft.client.gui.GuiGraphics;
@@ -39,10 +39,9 @@ public class EngineScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        assert minecraft != null;
-        assert minecraft.player != null;
+        if (minecraft == null) return;
 
-        var uiProviders = ArosEngineClient.getEngine().getUiProviders();
+        var uiProviders = ModuleUIs.getProviders();
 
         int size = uiProviders.size();
         states = new IconButtonState[size];
@@ -52,15 +51,15 @@ public class EngineScreen extends Screen {
         for (var entry : uiProviders.entrySet()) {
             var location = entry.getKey();
             var provider = entry.getValue();
+            Screen screen = provider.createUI(minecraft.player);
             //noinspection DataFlowIssue
             createIconButton(new WidgetSprites(
                     location.withPrefix("widget/"),
                     null,
                     location.withPrefix("widget/").withSuffix("_selected")
             ), () -> {
-                if (minecraft == null) return;
-                provider.openUI(minecraft.player);
-            }, index++, minecraft.player.hasPermissions(provider.requiredPermission()));
+                if (minecraft != null && screen != null) minecraft.setScreen(screen);
+            }, index++, screen != null);
         }
     }
 

@@ -2,6 +2,7 @@ package net.aros.engine.client.storage;
 
 import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import net.aros.engine.client.ArosEngineClient;
+import net.aros.engine.client.api.ClientStorageManager;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
@@ -44,7 +45,7 @@ public class ClientStorageUISessionManager implements StorageUISessionManager {
     private void sendInitialInfo() {
         Map<StorageKey<?>, StorageMetadata> metadataMap = new HashMap<>();
         List<ContentUpdate<?>> contentsList = new ArrayList<>();
-        ArosEngineClient.getEngine().storageManager().getAll().forEach((key, storage) -> {
+        ClientStorageManager.getAll().forEach((key, storage) -> {
             if (storage.getMetadata() != null)
                 metadataMap.put(key, storage.getMetadata());
             //noinspection unchecked,rawtypes

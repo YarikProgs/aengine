@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public final class ClientCameraController {
+    private static final Minecraft MC = Minecraft.getInstance();
     private @Nullable CameraMode mode;
     private long activeTicks;
 
@@ -24,9 +25,9 @@ public final class ClientCameraController {
         mode.start(new CameraModeContext(minecraft, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), activeTicks));
     }
 
-    public void tick(@NotNull Minecraft minecraft) {
-        if (minecraft.isPaused()) return;
-        if (minecraft.level == null || minecraft.player == null) {
+    public void tick() {
+        if (MC.isPaused()) return;
+        if (MC.level == null || MC.player == null) {
             reset();
             return;
         }
@@ -36,11 +37,11 @@ public final class ClientCameraController {
             return;
         }
 
-        CameraModeContext tickContext = new CameraModeContext(minecraft, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), activeTicks);
+        CameraModeContext tickContext = new CameraModeContext(MC, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), activeTicks);
         currentMode.tick(tickContext);
         activeTicks++;
 
-        if (currentMode.isFinished(new CameraModeContext(minecraft, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), activeTicks))) {
+        if (currentMode.isFinished(new CameraModeContext(MC, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false), activeTicks))) {
             reset();
         }
     }

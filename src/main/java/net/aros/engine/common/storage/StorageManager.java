@@ -1,46 +1,61 @@
 package net.aros.engine.common.storage;
 
 import net.aros.engine.common.api.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.StorageAccess;
 import net.aros.engine.common.api.storage.StorageEntry;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
+import net.aros.engine.common.events.RegisterServerStorageEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static net.aros.engine.common.ArosEngine.MOD_ID;
+
+@EventBusSubscriber(modid = MOD_ID)
 public class StorageManager {
-    private final Map<StorageKey<?>, AbstractStorage<?>> storages = new HashMap<>();
-    private final StorageAccess storageAccess = StorageAccess.wrap(storages);
-    private final StorageUISessionManager sessionManager;
+    private static final Map<StorageKey<?>, AbstractStorage<?>> STORAGES = new HashMap<>();
+    private static final StorageUISessionManager SESSION_MANAGER = new ServerStorageUISessionManager();
 
-    public StorageManager(StorageUISessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    @SubscribeEvent
+    public static void onAddReloadListeners(AddReloadListenerEvent event) {
+        var storages = NeoForge.EVENT_BUS
+                .post(new RegisterServerStorageEvent())
+                .getRegisteredStorages();
+
+        STORAGES.clear();
+        STORAGES.putAll(storages);
+        for (AbstractStorage<?> value : storages.values()) {
+            value.addListeners(StorageManager::onMetadataUpdate, StorageManager::onContentUpdate);
+            event.addListener(value.createReloadListener());
+        }
     }
 
-    public void putAll(Map<StorageKey<?>, AbstractStorage<?>> storages) {
-        this.storages.putAll(storages);
+    public static void onMetadataUpdate(StorageKey<?> key, StorageMetadata metadata) {
+        SESSION_MANAGER.sendMetadata(key, metadata);
     }
 
-    public StorageAccess storageAccess() {
-        return storageAccess;
+    public static <T> void onContentUpdate(StorageKey<T> key, Set<StorageEntry<T>> entries) {
+        SESSION_MANAGER.sendContentUpdate(new ContentUpdate<>(key, entries));
     }
 
-    public StorageUISessionManager sessionManager() {
-        return sessionManager;
+    public static StorageUISessionManager sessionManager() {
+        return SESSION_MANAGER;
     }
 
-    public void onMetadataUpdate(StorageKey<?> key, StorageMetadata metadata) {
-        sessionManager.sendMetadata(key, metadata);
+    @Nullable
+    public static <T> AbstractStorage<T> get(StorageKey<T> key) {
+        //noinspection unchecked
+        return (AbstractStorage<T>) STORAGES.get(key);
     }
 
-    public <T> void onContentUpdate(StorageKey<T> key, Set<StorageEntry<T>> entries) {
-        sessionManager.sendContentUpdate(new ContentUpdate<>(key, entries));
-    }
-
-    public Map<StorageKey<?>, AbstractStorage<?>> getAll() {
-        return Collections.unmodifiableMap(storages);
+    public static Map<StorageKey<?>, AbstractStorage<?>> getAll() {
+        return Collections.unmodifiableMap(STORAGES);
     }
 }

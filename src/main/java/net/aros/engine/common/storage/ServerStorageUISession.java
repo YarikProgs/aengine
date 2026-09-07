@@ -3,7 +3,6 @@ package net.aros.engine.common.storage;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import com.lowdragmc.lowdraglib2.syncdata.rpc.RPCSender;
-import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,13 +12,13 @@ public class ServerStorageUISession {
     @RPCPacket("session.storageui.create")
     public static void onCreate(@NotNull RPCSender sender) {
         if (sender.asPlayer() != null)
-            ArosEngine.getEngine().storageManager().sessionManager().create(sender.asPlayer());
+            StorageManager.sessionManager().create(sender.asPlayer());
     }
 
     @RPCPacket("session.storageui.close")
     public static void onClose(@NotNull RPCSender sender) {
         if (sender.asPlayer() != null)
-            ArosEngine.getEngine().storageManager().sessionManager().close(sender.asPlayer());
+            StorageManager.sessionManager().close(sender.asPlayer());
     }
 
     public static void sendInitialDataTo(ServerPlayer player, InitialData initialData) {

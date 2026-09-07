@@ -4,6 +4,7 @@ import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
 import net.aros.engine.client.ArosEngineClient;
+import net.aros.engine.client.api.ClientStorageManager;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
@@ -34,12 +35,12 @@ public class ClientStorageUISession {
 
     public static void createBoth() {
         RPCPacketDistributor.rpcToServer("session.storageui.create");
-        ArosEngineClient.getEngine().storageManager().sessionManager().create(null);
+        ClientStorageManager.sessionManager().create(null);
     }
 
     public static void closeBoth() {
         RPCPacketDistributor.rpcToServer("session.storageui.close");
-        ArosEngineClient.getEngine().storageManager().sessionManager().close(null);
+        ClientStorageManager.sessionManager().close(null);
     }
 
     private static Optional<StorageUI> getCurrentStorageUI() {

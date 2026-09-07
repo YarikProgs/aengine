@@ -1,9 +1,10 @@
 package net.aros.engine.client.api.ui;
 
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 public interface ModuleUIProvider {
-    void openUI(Player player);
-
-   int requiredPermission();
+    @Nullable
+    Screen createUI(Player player);
 }
