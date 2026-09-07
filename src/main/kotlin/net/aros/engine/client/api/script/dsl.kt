@@ -2,14 +2,13 @@
 
 package net.aros.engine.client.api.script
 
-import net.aros.engine.client.script.procedures.ClientProcedures
 import net.aros.engine.client.script.events.ClientEventSubscriptions
+import net.aros.engine.client.script.procedures.ClientProcedures
 import net.aros.engine.common.script.procedure.Procedure
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.Event
 import org.jetbrains.annotations.ApiStatus
-import kotlin.jvm.javaObjectType
 import kotlin.reflect.KClass
 
 inline fun <reified T : Event> onClient(noinline body: T.() -> Unit) {

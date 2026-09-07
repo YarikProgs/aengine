@@ -1,7 +1,6 @@
 package net.aros.engine.common.storage;
 
 import com.mojang.logging.LogUtils;
-import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.api.storage.StorageKey;
 import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.minecraft.server.level.ServerPlayer;

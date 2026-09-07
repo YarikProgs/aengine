@@ -1,7 +1,6 @@
 package net.aros.engine.client.storage;
 
 import com.lowdragmc.lowdraglib2.gui.holder.ModularUIScreen;
-import net.aros.engine.client.ArosEngineClient;
 import net.aros.engine.client.api.ClientStorageManager;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.common.api.storage.StorageKey;

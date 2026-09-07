@@ -1,6 +1,9 @@
 package net.aros.engine.client.camera;
 
-import net.aros.engine.client.api.camera.*;
+import net.aros.engine.client.api.camera.CameraMode;
+import net.aros.engine.client.api.camera.CameraModeContext;
+import net.aros.engine.client.api.camera.CameraRenderContext;
+import net.aros.engine.client.api.camera.CameraState;
 import net.aros.engine.client.api.camera.position.PositionInterpolation;
 import net.aros.engine.client.api.camera.rotation.RotationMode;
 import net.aros.engine.client.api.camera.settings.EntityCameraSettings;
