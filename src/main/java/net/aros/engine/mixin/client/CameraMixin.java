@@ -1,7 +1,7 @@
 package net.aros.engine.mixin.client;
 
-import net.aros.engine.client.api.camera.AeCameras;
-import net.aros.engine.client.api.camera.CameraState;
+import net.aros.engine.client.camera.AeCameras;
+import net.aros.engine.client.camera.CameraState;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;

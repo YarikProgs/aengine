@@ -1,8 +1,8 @@
 package net.aros.engine.client.init;
 
-import net.aros.engine.client.api.ModuleUIs;
 import net.aros.engine.client.gui.ui.StorageUI;
 import net.aros.engine.client.gui.ui.ValuesUI;
+import net.aros.engine.client.ui.ModuleUIs;
 import net.aros.engine.common.ArosEngine;
 
 public class AeUIs {

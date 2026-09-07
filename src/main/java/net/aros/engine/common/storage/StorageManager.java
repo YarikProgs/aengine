@@ -1,10 +1,10 @@
 package net.aros.engine.common.storage;
 
-import net.aros.engine.common.api.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.StorageEntry;
-import net.aros.engine.common.api.storage.StorageKey;
-import net.aros.engine.common.api.storage.metadata.StorageMetadata;
 import net.aros.engine.common.events.RegisterServerStorageEvent;
+import net.aros.engine.common.storage.metadata.StorageMetadata;
+import net.aros.engine.common.storage.session.ContentUpdate;
+import net.aros.engine.common.storage.session.ServerStorageUISessionManager;
+import net.aros.engine.common.storage.session.StorageUISessionManager;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;

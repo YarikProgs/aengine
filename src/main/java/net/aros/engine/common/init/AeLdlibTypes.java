@@ -2,12 +2,12 @@ package net.aros.engine.common.init;
 
 import com.lowdragmc.lowdraglib2.syncdata.AccessorRegistries;
 import com.lowdragmc.lowdraglib2.syncdata.accessor.direct.CustomDirectAccessor;
-import net.aros.engine.common.api.storage.StorageKey;
-import net.aros.engine.common.api.storage.metadata.StorageMetadata;
-import net.aros.engine.common.api.value.Value;
-import net.aros.engine.common.api.value.Values;
-import net.aros.engine.common.storage.ContentUpdate;
-import net.aros.engine.common.storage.InitialData;
+import net.aros.engine.common.storage.StorageKey;
+import net.aros.engine.common.storage.metadata.StorageMetadata;
+import net.aros.engine.common.storage.session.ContentUpdate;
+import net.aros.engine.common.storage.session.InitialData;
+import net.aros.engine.common.value.Value;
+import net.aros.engine.common.value.Values;
 
 public class AeLdlibTypes {
     @SuppressWarnings("unchecked")

@@ -1,7 +1,7 @@
 package net.aros.examples.common.modules.txt;
 
 import com.mojang.serialization.DataResult;
-import net.aros.engine.common.api.storage.loader.AbstractResourceLoader;
+import net.aros.engine.common.storage.loader.AbstractResourceLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 

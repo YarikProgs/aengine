@@ -1,7 +1,7 @@
 package net.aros.engine.common.events;
 
-import net.aros.engine.common.api.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.storage.AbstractStorage;
+import net.aros.engine.common.storage.StorageKey;
 import net.neoforged.bus.api.Event;
 import org.jetbrains.annotations.NotNull;
 

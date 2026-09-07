@@ -6,10 +6,10 @@ import com.lowdragmc.lowdraglib2.gui.ui.data.TextWrap;
 import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacket;
 import com.lowdragmc.lowdraglib2.networking.rpc.RPCPacketDistributor;
-import net.aros.engine.client.api.ui.ValuesUIProviders;
 import net.aros.engine.client.gui.ui.ValuesUI;
-import net.aros.engine.common.api.value.Value;
+import net.aros.engine.client.ui.ValuesUIProviders;
 import net.aros.engine.common.init.AeRegistries;
+import net.aros.engine.common.value.Value;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 

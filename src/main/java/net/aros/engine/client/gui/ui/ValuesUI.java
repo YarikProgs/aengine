@@ -19,7 +19,7 @@ import dev.vfyjxf.taffy.style.AlignItems;
 import dev.vfyjxf.taffy.style.FlexDirection;
 import net.aros.engine.client.gui.ui.elements.ValueTreeList;
 import net.aros.engine.client.gui.ui.elements.ValueViewer;
-import net.aros.engine.common.api.value.Values;
+import net.aros.engine.common.value.Values;
 import net.minecraft.client.Minecraft;
 import org.appliedenergistics.yoga.YogaEdge;
 import org.jetbrains.annotations.Contract;

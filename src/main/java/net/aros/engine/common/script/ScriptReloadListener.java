@@ -2,11 +2,10 @@ package net.aros.engine.common.script;
 
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.script.ScriptBackends;
-import net.aros.engine.common.api.script.compilation.AeScript;
-import net.aros.engine.common.api.script.compilation.ScriptSource;
-import net.aros.engine.common.api.script.compilation.backend.ScriptBackend;
-import net.aros.engine.common.api.script.compilation.exception.ScriptCompilationException;
+import net.aros.engine.common.script.compilation.AeScript;
+import net.aros.engine.common.script.compilation.ScriptSource;
+import net.aros.engine.common.script.compilation.backend.ScriptBackend;
+import net.aros.engine.common.script.compilation.exception.ScriptCompilationException;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;

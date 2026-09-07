@@ -1,9 +1,6 @@
 package net.aros.engine.client.camera;
 
-import net.aros.engine.client.api.camera.CameraMode;
-import net.aros.engine.client.api.camera.CameraModeContext;
-import net.aros.engine.client.api.camera.CameraRenderContext;
-import net.aros.engine.client.api.camera.CameraState;
+import net.aros.engine.client.camera.mode.CameraMode;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;

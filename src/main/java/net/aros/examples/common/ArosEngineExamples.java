@@ -1,13 +1,13 @@
 package net.aros.examples.common;
 
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.DirectStorage;
-import net.aros.engine.common.api.storage.StorageKey;
-import net.aros.engine.common.api.value.ValueType;
 import net.aros.engine.common.events.RegisterServerStorageEvent;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.script.procedure.Procedures;
+import net.aros.engine.common.storage.AbstractStorage;
+import net.aros.engine.common.storage.DirectStorage;
+import net.aros.engine.common.storage.StorageKey;
+import net.aros.engine.common.value.ValueType;
 import net.aros.examples.common.modules.txt.Txt;
 import net.aros.examples.common.modules.txt.TxtLoader;
 import net.minecraft.core.Registry;

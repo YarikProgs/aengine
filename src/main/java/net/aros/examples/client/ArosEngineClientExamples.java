@@ -2,9 +2,9 @@ package net.aros.examples.client;
 
 import net.aros.engine.client.events.RegisterClientStorageEvent;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.AbstractStorage;
-import net.aros.engine.common.api.storage.DirectStorage;
-import net.aros.engine.common.api.storage.StorageKey;
+import net.aros.engine.common.storage.AbstractStorage;
+import net.aros.engine.common.storage.DirectStorage;
+import net.aros.engine.common.storage.StorageKey;
 import net.aros.examples.common.ArosEngineExamples;
 import net.aros.examples.common.modules.txt.Txt;
 import net.aros.examples.common.modules.txt.TxtLoader;

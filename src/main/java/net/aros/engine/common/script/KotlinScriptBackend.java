@@ -1,12 +1,12 @@
 package net.aros.engine.common.script;
 
-import net.aros.engine.common.api.script.compilation.AeScript;
-import net.aros.engine.common.api.script.compilation.ScriptLanguage;
-import net.aros.engine.common.api.script.compilation.ScriptSource;
-import net.aros.engine.common.api.script.compilation.backend.ScriptBackend;
-import net.aros.engine.common.api.script.compilation.diagnostic.ScriptDiagnostic;
-import net.aros.engine.common.api.script.compilation.exception.ScriptCompilationException;
-import net.aros.engine.common.api.script.compilation.exception.ScriptExecutionException;
+import net.aros.engine.common.script.compilation.AeScript;
+import net.aros.engine.common.script.compilation.ScriptLanguage;
+import net.aros.engine.common.script.compilation.ScriptSource;
+import net.aros.engine.common.script.compilation.backend.ScriptBackend;
+import net.aros.engine.common.script.compilation.diagnostic.ScriptDiagnostic;
+import net.aros.engine.common.script.compilation.exception.ScriptCompilationException;
+import net.aros.engine.common.script.compilation.exception.ScriptExecutionException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;

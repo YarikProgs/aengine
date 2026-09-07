@@ -2,7 +2,7 @@ package net.aros.engine.common.init;
 
 import com.mojang.serialization.Codec;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.value.ValueType;
+import net.aros.engine.common.value.ValueType;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;

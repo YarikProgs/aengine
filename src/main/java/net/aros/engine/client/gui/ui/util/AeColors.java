@@ -2,7 +2,7 @@ package net.aros.engine.client.gui.ui.util;
 
 import com.mojang.logging.LogUtils;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.api.storage.metadata.LoadStatus;
+import net.aros.engine.common.storage.metadata.LoadStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

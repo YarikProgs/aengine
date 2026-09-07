@@ -1,7 +1,7 @@
 package net.aros.engine.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.aros.engine.client.api.camera.AeCameras;
+import net.aros.engine.client.camera.AeCameras;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import org.joml.Matrix4f;
