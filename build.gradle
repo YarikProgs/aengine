@@ -150,7 +150,8 @@ dependencies {
     kotlinScripting "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.kotlin_version}"
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 
-    implementation "net.aros:canon-neoforge:1.0.1"
+    additionalRuntimeClasspath api("com.github.YarikProgs:haru:1.0.0-beta.2")
+    additionalRuntimeClasspath api("net.aros:canon-neoforge:1.0.1")
 }
 
 def kotlinScriptingLibsDir = layout.projectDirectory.dir("src/main/resources/kotlin-scripting-libs")

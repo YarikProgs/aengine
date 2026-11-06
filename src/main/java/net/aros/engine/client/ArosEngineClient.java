@@ -7,7 +7,7 @@ import net.aros.engine.client.script.events.ClientEventSubscriptions;
 import net.aros.engine.client.script.procedures.ClientProcedureDecoding;
 import net.aros.engine.client.script.procedures.ClientProcedures;
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.network.ProcedureCallPayload;
+import net.aros.engine.common.network.s2c.ProcedureCallPayload;
 import net.aros.engine.common.script.ScriptReloadListener;
 import net.aros.engine.common.script.procedure.ProcedureSerializationException;
 import net.aros.examples.client.ArosEngineClientExamples;

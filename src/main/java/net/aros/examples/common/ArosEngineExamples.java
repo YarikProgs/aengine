@@ -1,6 +1,8 @@
 package net.aros.examples.common;
 
 import net.aros.engine.common.ArosEngine;
+import net.aros.engine.common.dialogue.DialogueDialect;
+import net.aros.engine.common.dialogue.DialogueDialects;
 import net.aros.engine.common.events.RegisterServerStorageEvent;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.script.procedure.Procedures;
@@ -46,6 +48,8 @@ public class ArosEngineExamples {
         NeoForge.EVENT_BUS.addListener(RegisterServerStorageEvent.class, event -> {
             event.register(TXT_STORAGE);
         });
+
+        DialogueDialects.register(new DialogueDialect("ex"));
 
         ITEMS.register(bus);
     }

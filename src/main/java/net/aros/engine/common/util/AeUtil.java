@@ -1,11 +1,45 @@
 package net.aros.engine.common.util;
 
+import net.aros.haru.compile.CompiledProgram;
+import net.aros.haru.runtime.AbstractDialoguePlayer;
+import net.aros.haru.runtime.DialogueException;
+import net.aros.haru.value.Value;
 import net.minecraft.util.Mth;
+import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.joml.Vector3f;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class AeUtil {
+    private static final String CACHE_DIR_NAME = ".aengine";
+    private static final Path CACHE_DIR = FMLPaths.GAMEDIR.get().resolve(CACHE_DIR_NAME);
+
+    public static Path getCacheDir() {
+        try {
+            Files.createDirectories(CACHE_DIR);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return CACHE_DIR;
+    }
+
+    public static @Unmodifiable @Nullable Object objectValue(@NotNull AbstractDialoguePlayer player, @NotNull String locale, @NotNull Value value) throws DialogueException {
+        CompiledProgram program = player.linkedProgram().program();
+        if (value.isTextRef() || value.isLiteralRef())
+            return player.renderValue(value, locale);
+        if (value.isNumber())
+            return value.asNumber();
+        if (value.isNull())
+            return null;
+        throw new IllegalStateException("Unknown value: " + value);
+    }
+
     public static void requireUnitSpeed(double value, String name) {
         if (!Double.isFinite(value) || value < 0.0D || value > 1.0D) {
             throw new IllegalArgumentException(name + " must be between 0.0 and 1.0");

@@ -36,6 +36,7 @@ inline val Int.hours: Ticks
     get() = minutes * 60
 
 infix fun Item.x(count: Int) = ItemStack(this, count)
+infix fun Int.x(item: Item) = ItemStack(item, this)
 
 fun <S, T> StateKey<S, T>.set(scope: S, value: T) = Can.set(this, scope, value)
 fun <S, T> StateKey<S, T>.get(scope: S): T = Can.get(this, scope)

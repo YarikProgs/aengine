@@ -5,10 +5,11 @@ import com.mojang.logging.LogUtils;
 import net.aros.engine.client.ArosEngineClient;
 import net.aros.engine.common.command.AEngineCommand;
 import net.aros.engine.common.config.AeConfig;
+import net.aros.engine.common.dialogue.DialogueReloadListener;
 import net.aros.engine.common.init.AeLdlibTypes;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.init.AeValueTypes;
-import net.aros.engine.common.network.ProcedureCallPayload;
+import net.aros.engine.common.network.s2c.ProcedureCallPayload;
 import net.aros.engine.common.script.KotlinScriptBackend;
 import net.aros.engine.common.script.ScriptBackends;
 import net.aros.engine.common.script.ScriptReloadListener;
@@ -45,11 +46,14 @@ public final class ArosEngine {
         ScriptBackends.register(KotlinScriptBackend.INSTANCE);
         NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, e
                 -> AEngineCommand.register(e.getDispatcher()));
-        NeoForge.EVENT_BUS.addListener(AddReloadListenerEvent.class, e -> e.addListener(new ScriptReloadListener(
-                () -> {
-                    Procedures.clear();
-                    EventSubscriptions.clear();
-                }, Predicates::alwaysTrue)));
+        NeoForge.EVENT_BUS.addListener(AddReloadListenerEvent.class, e -> {
+            e.addListener(new ScriptReloadListener(
+                    () -> {
+                        Procedures.clear();
+                        EventSubscriptions.clear();
+                    }, Predicates::alwaysTrue));
+            e.addListener(new DialogueReloadListener());
+        });
         bus.addListener(RegisterPayloadHandlersEvent.class, e
                 -> e.registrar("1.0.0").playToClient(ProcedureCallPayload.TYPE, ProcedureCallPayload.STREAM_CODEC, ArosEngineClient::handleProcedureCall));
 

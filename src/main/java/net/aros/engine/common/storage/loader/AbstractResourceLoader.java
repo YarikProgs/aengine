@@ -22,14 +22,20 @@ public abstract class AbstractResourceLoader<T> {
     private final String path;
     private final String fileExtension;
     private final ResourceLocation key;
+    private final int loadPriority;
     private KeyFunction<T> keyFactory;
     private volatile LoaderMetadata metadata;
 
-    public AbstractResourceLoader(ResourceLocation key, String path, String fileExtension) {
+    public AbstractResourceLoader(ResourceLocation key, String path, String fileExtension, int loadPriority) {
         this.key = key;
         this.path = path;
         this.fileExtension = fileExtension;
+        this.loadPriority = loadPriority;
         this.keyFactory = (pathKey, element) -> getKeyFromPath(pathKey);
+    }
+
+    public AbstractResourceLoader(ResourceLocation key, String path, String fileExtension) {
+        this(key, path, fileExtension, 0);
     }
 
     public abstract DataResult<T> parse(ResourceLocation path, Resource resource) throws Exception;
@@ -93,5 +99,9 @@ public abstract class AbstractResourceLoader<T> {
     @FunctionalInterface
     public interface KeyFunction<T> {
         ResourceLocation getKeyOf(ResourceLocation path, T element);
+    }
+
+    public int loadPriority() {
+        return loadPriority;
     }
 }

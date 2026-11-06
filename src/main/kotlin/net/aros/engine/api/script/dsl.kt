@@ -3,7 +3,7 @@
 package net.aros.engine.api.script
 
 import net.aros.canon.event.custom.StateRegistrationEvent
-import net.aros.engine.common.network.ProcedureCallPayload
+import net.aros.engine.common.network.s2c.ProcedureCallPayload
 import net.aros.engine.common.script.events.EventSubscriptions
 import net.aros.engine.common.script.procedure.Procedure
 import net.aros.engine.common.script.procedure.Procedures

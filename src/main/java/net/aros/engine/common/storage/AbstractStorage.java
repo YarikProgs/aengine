@@ -86,7 +86,8 @@ public abstract class AbstractStorage<T> {
         public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
             return CompletableFuture
                     .supplyAsync(() -> {
-                        List<AbstractResourceLoader<T>> activeLoaders = List.copyOf(loaders.values());
+                        List<AbstractResourceLoader<T>> activeLoaders = new ArrayList<>(loaders.values());
+                        activeLoaders.sort(Comparator.comparingInt(AbstractResourceLoader::loadPriority));
                         for (AbstractResourceLoader<T> loader : activeLoaders) {
                             loader.markReloadStart();
                         }

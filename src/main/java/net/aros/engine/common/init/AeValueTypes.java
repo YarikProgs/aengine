@@ -12,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public class AeValueTypes {
+    // Vanilla Types
+
     public static final ValueType<Boolean> BOOL = registerFromCodecs("bool", Codec.BOOL, ByteBufCodecs.BOOL);
     public static final ValueType<Byte> BYTE = registerFromCodecs("byte", Codec.BYTE, ByteBufCodecs.BYTE);
     public static final ValueType<Short> SHORT = registerFromCodecs("short", Codec.SHORT, ByteBufCodecs.SHORT);

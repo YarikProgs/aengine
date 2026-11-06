@@ -1,4 +1,4 @@
-package net.aros.engine.common.network;
+package net.aros.engine.common.network.s2c;
 
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.script.procedure.ProcedureEncoding;
