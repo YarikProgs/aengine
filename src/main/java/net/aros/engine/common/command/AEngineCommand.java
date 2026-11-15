@@ -5,22 +5,35 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.dialogue.Dialogues;
+import net.aros.engine.common.dialogue.DialogueProjectExporter;
+import net.aros.engine.common.dialogue.DialogueReloadListener;
+import net.aros.engine.common.dialogue.playing.DialogueDebug;
+import net.aros.engine.common.dialogue.playing.DialoguesTicker;
+import net.aros.engine.common.dialogue.playing.DialogueInstance;
+import net.aros.engine.common.dialogue.playing.EndReason;
+import net.aros.engine.common.dialogue.playing.PauseReason;
+import net.aros.engine.common.dialogue.playing.SoloAudience;
 import net.aros.engine.common.util.AeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +55,28 @@ public final class AEngineCommand {
     private static class Dialogue {
         public static void register(LiteralArgumentBuilder<CommandSourceStack> root) {
             root.then(literal("dialogue")
+                    .requires(source -> source.hasPermission(2))
+                    .then(literal("status").executes(ctx -> status(ctx.getSource())))
+                    .then(literal("debug")
+                            .then(literal("on").executes(ctx -> debug(ctx.getSource(), true)))
+                            .then(literal("off").executes(ctx -> debug(ctx.getSource(), false))))
+                    .then(literal("info")
+                            .executes(ctx -> infoCurrent(ctx.getSource()))
+                            .then(argument("id", ResourceLocationArgument.id())
+                                    .suggests(Dialogue::suggestDialogueId)
+                                    .executes(ctx -> info(ctx.getSource(), ResourceLocationArgument.getId(ctx, "id")))))
                     .then(literal("list")
                             .executes(ctx -> list(ctx.getSource())))
+                    .then(literal("play")
+                            .then(argument("id", ResourceLocationArgument.id())
+                                    .suggests(Dialogue::suggestDialogueId)
+                                    .executes(ctx -> play(ctx.getSource(), ResourceLocationArgument.getId(ctx, "id")))))
+                    .then(literal("pause")
+                            .executes(ctx -> pause(ctx.getSource())))
+                    .then(literal("resume")
+                            .executes(ctx -> resume(ctx.getSource())))
+                    .then(literal("cancel")
+                            .executes(ctx -> cancel(ctx.getSource())))
                     .then(literal("project")
                             .then(literal("list")
                                     .executes(ctx -> projectList(ctx.getSource())))
@@ -57,7 +90,130 @@ public final class AEngineCommand {
                             .then(literal("export")
                                     .then(argument("name", StringArgumentType.word())
                                             .suggests(Dialogue::suggestProjectName)
-                                            .executes(ctx -> projectExport(ctx.getSource(), StringArgumentType.getString(ctx, "name")))))));
+                                            .executes(ctx -> projectExport(ctx.getSource(), StringArgumentType.getString(ctx, "name"), true, false))
+                                            .then(literal("overwrite").executes(ctx -> projectExport(ctx.getSource(), StringArgumentType.getString(ctx, "name"), true, true)))))
+                            .then(literal("export-mod")
+                                    .then(argument("name", StringArgumentType.word())
+                                            .suggests(Dialogue::suggestProjectName)
+                                            .executes(ctx -> projectExport(ctx.getSource(), StringArgumentType.getString(ctx, "name"), false, false))
+                                            .then(literal("overwrite").executes(ctx -> projectExport(ctx.getSource(), StringArgumentType.getString(ctx, "name"), false, true)))))));
+        }
+
+        private static int status(CommandSourceStack source) {
+            var report = DialogueReloadListener.lastReport();
+            if (report == null) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.status.none"));
+                return 0;
+            }
+            report.display(source);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static int debug(CommandSourceStack source, boolean enabled) throws CommandSyntaxException {
+            DialogueDebug.set(source.getPlayerOrException(), enabled);
+            source.sendSuccess(() -> ArosEngine.translation("commands", enabled ? "dialogue.debug.on" : "dialogue.debug.off"), false);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static int infoCurrent(CommandSourceStack source) throws CommandSyntaxException {
+            var active = DialoguesTicker.activeFor(source.getPlayerOrException()).orElse(null);
+            if (active == null) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.info.none"));
+                return 0;
+            }
+            displayInfo(source, active.dialogue());
+            source.sendSystemMessage(ArosEngine.translation("commands", "dialogue.info.instance",
+                    active.instanceId().toString(), active.debugState(), active.currentMembers().size(), active.audience().admin().getGameProfile().getName())
+                    .withStyle(ChatFormatting.GRAY));
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static int info(CommandSourceStack source, ResourceLocation id) {
+            var dialogue = Dialogues.get(id).orElse(null);
+            if (dialogue == null) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.play.not_found", id.toString()));
+                return 0;
+            }
+            displayInfo(source, dialogue);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static void displayInfo(CommandSourceStack source, net.aros.engine.common.dialogue.Dialogue dialogue) {
+            var report = DialogueReloadListener.lastReport();
+            String origin = report == null ? "?" : report.origins().getOrDefault(dialogue.id(), "?");
+            source.sendSystemMessage(ArosEngine.translation("commands", "dialogue.info.header", dialogue.id().toString()).withStyle(ChatFormatting.GOLD));
+            source.sendSystemMessage(ArosEngine.translation("commands", "dialogue.info.details",
+                    dialogue.dialect().name(), dialogue.metadata().priority(), dialogue.metadata().onAudienceChange().name(), origin)
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        private static int play(CommandSourceStack source, ResourceLocation id) throws CommandSyntaxException {
+            if (Dialogues.get(id).isEmpty()) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.play.not_found", id.toString()));
+                return 0;
+            }
+
+            var player = source.getPlayerOrException();
+            var result = DialoguesTicker.start(new SoloAudience(player), id, Map.of());
+            return switch (result) {
+                case STARTED -> {
+                    source.sendSuccess(() -> ArosEngine.translation("commands", "dialogue.play.started", id.toString()), false);
+                    yield Command.SINGLE_SUCCESS;
+                }
+                case QUEUED -> {
+                    source.sendSuccess(() -> ArosEngine.translation("commands", "dialogue.play.queued", id.toString()), false);
+                    yield Command.SINGLE_SUCCESS;
+                }
+                case REJECTED -> {
+                    source.sendFailure(ArosEngine.translation("commands", "dialogue.play.rejected", id.toString()));
+                    yield 0;
+                }
+            };
+        }
+
+        private static int pause(CommandSourceStack source) throws CommandSyntaxException {
+            var player = source.getPlayerOrException();
+            var active = requireAdminDialogue(source, player, "pause");
+            if (active == null) return 0;
+            active.pause(PauseReason.ADMIN);
+            source.sendSuccess(() -> ArosEngine.translation("commands", "dialogue.pause.success"), false);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static int resume(CommandSourceStack source) throws CommandSyntaxException {
+            var player = source.getPlayerOrException();
+            var active = requireAdminDialogue(source, player, "resume");
+            if (active == null) return 0;
+            active.resume(PauseReason.ADMIN);
+            source.sendSuccess(() -> ArosEngine.translation("commands", "dialogue.resume.success"), false);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        private static int cancel(CommandSourceStack source) throws CommandSyntaxException {
+            var player = source.getPlayerOrException();
+            var active = requireAdminDialogue(source, player, "cancel");
+            if (active == null) return 0;
+            active.finish(EndReason.CANCELLED);
+            source.sendSuccess(() -> ArosEngine.translation("commands", "dialogue.cancel.success"), false);
+            return Command.SINGLE_SUCCESS;
+        }
+
+        /** Returns the active dialogue after checking the admin, or sends failure feedback. */
+        private static @Nullable DialogueInstance requireAdminDialogue(CommandSourceStack source, ServerPlayer player, String action) {
+            var active = DialoguesTicker.activeFor(player).orElse(null);
+            if (active == null) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue." + action + ".none"));
+                return null;
+            }
+            if (!active.isAdmin(player)) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue." + action + ".not_admin"));
+                return null;
+            }
+            return active;
+        }
+
+        private static CompletableFuture<Suggestions> suggestDialogueId(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+            return SharedSuggestionProvider.suggestResource(Dialogues.getAll().keySet(), builder);
         }
 
         private static int list(CommandSourceStack source) {
@@ -116,11 +272,42 @@ public final class AEngineCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        private static int projectExport(CommandSourceStack source, String name) {
+        private static int projectExport(CommandSourceStack source, String name, boolean archive, boolean overwrite) {
             if (!checkModId(source, name)) return 0;
 
-            // TODO: export logic
-            throw new IllegalStateException("Not implemented yet");
+            Path project = projectDir(name);
+            if (!Files.isDirectory(project, LinkOption.NOFOLLOW_LINKS)) {
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.project.open.not_found", name));
+                return 0;
+            }
+            Path target = AeUtil.getCacheDir().resolve(archive ? "exports" : "mod-exports")
+                    .resolve(archive ? name + ".zip" : name);
+            if (Files.exists(target, LinkOption.NOFOLLOW_LINKS) && !overwrite) {
+                String command = "/aengine dialogue project " + (archive ? "export " : "export-mod ") + name + " overwrite";
+                var confirmation = Component.literal(command).withStyle(style -> style.withColor(ChatFormatting.YELLOW)
+                        .withUnderlined(true).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command)));
+                source.sendSystemMessage(ArosEngine.translation("commands", "dialogue.project.export.already_exists", openLink(target), confirmation)
+                        .withStyle(ChatFormatting.YELLOW));
+                return 0;
+            }
+            try {
+                var report = DialogueReloadListener.compileProject(source.getServer().getResourceManager(), name);
+                if (report.errors() > 0) {
+                    source.sendFailure(ArosEngine.translation("commands", "dialogue.project.export.compile_failed", name, report.errors()));
+                    report.display(source);
+                    return 0;
+                }
+                if (report.warnings() > 0) report.display(source);
+                DialogueProjectExporter.export(project, target, name, archive, overwrite);
+            } catch (IOException e) {
+                ArosEngine.LOGGER.error("Failed to export dialogue project '{}' to '{}'", name, target, e);
+                source.sendFailure(ArosEngine.translation("commands", "dialogue.project.export.failed", name));
+                return 0;
+            }
+            source.sendSuccess(() -> ArosEngine.translation("commands",
+                    archive ? "dialogue.project.export.success" : "dialogue.project.export_mod.success",
+                    name, openLink(target)), false);
+            return Command.SINGLE_SUCCESS;
         }
 
         private static int projectList(CommandSourceStack source) {
@@ -161,7 +348,7 @@ public final class AEngineCommand {
         }
 
         private static boolean checkModId(CommandSourceStack source, String name) {
-            if (ResourceLocation.isValidNamespace(name)) return true;
+            if (ResourceLocation.isValidNamespace(name) && !name.equals(".") && !name.equals("..")) return true;
             source.sendFailure(ArosEngine.translation("commands", "dialogue.project.invalid_name", name));
             return false;
         }

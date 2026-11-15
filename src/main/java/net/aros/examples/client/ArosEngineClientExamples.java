@@ -1,6 +1,7 @@
 package net.aros.examples.client;
 
 import net.aros.engine.client.events.RegisterClientStorageEvent;
+import net.aros.engine.client.events.RegisterPhraseRendererEvent;
 import net.aros.engine.common.ArosEngine;
 import net.aros.engine.common.storage.AbstractStorage;
 import net.aros.engine.common.storage.DirectStorage;
@@ -21,5 +22,9 @@ public class ArosEngineClientExamples {
         bus.addListener(RegisterClientStorageEvent.class, event ->
             event.register(CLIENT_TXT_STORAGE)
         );
+
+        bus.addListener(RegisterPhraseRendererEvent.class, event -> {
+            event.register("ex", ExPhraseRenderer.INSTANCE);
+        });
     }
 }

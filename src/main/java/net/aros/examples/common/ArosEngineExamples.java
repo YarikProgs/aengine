@@ -1,8 +1,9 @@
 package net.aros.examples.common;
 
 import net.aros.engine.common.ArosEngine;
-import net.aros.engine.common.dialogue.DialogueDialect;
-import net.aros.engine.common.dialogue.DialogueDialects;
+import net.aros.engine.common.dialogue.LineInterpreter;
+import net.aros.engine.common.dialogue.playing.PlayContext;
+import net.aros.engine.common.events.RegisterDialogueDialectEvent;
 import net.aros.engine.common.events.RegisterServerStorageEvent;
 import net.aros.engine.common.init.AeRegistries;
 import net.aros.engine.common.script.procedure.Procedures;
@@ -12,8 +13,17 @@ import net.aros.engine.common.storage.StorageKey;
 import net.aros.engine.common.value.ValueType;
 import net.aros.examples.common.modules.txt.Txt;
 import net.aros.examples.common.modules.txt.TxtLoader;
+import net.aros.haru.ast.TextPart;
+import net.aros.haru.runtime.AbstractDialoguePlayer;
+import net.aros.haru.runtime.AbstractTextRenderer;
+import net.aros.haru.runtime.DialogueException;
+import net.aros.haru.value.Value;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +37,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 import static net.aros.engine.common.ArosEngine.MOD_ID;
 
@@ -49,9 +60,54 @@ public class ArosEngineExamples {
             event.register(TXT_STORAGE);
         });
 
-        DialogueDialects.register(new DialogueDialect("ex"));
-
         ITEMS.register(bus);
+        bus.addListener(this::onRegisterDialects);
+    }
+
+    private void onRegisterDialects(@NotNull RegisterDialogueDialectEvent event) {
+        event.create("ex", builder -> {
+            builder.setPhrasewiseExtraInfoCodec(ByteBufCodecs.STRING_UTF8);
+            builder.setLinewiseExtraInfoCodec(ByteBufCodecs.STRING_UTF8);
+            builder.setLineInterpreter(new LineInterpreter() {
+                @Override
+                public void onSingleLine(ServerPlayer viewer, PlayContext ctx, Value[] args) throws DialogueException {
+                    Component speaker = ctx.render(viewer, args[0]);
+                    ctx.show(viewer, Component.empty()
+                            .append(speaker)
+                            .append(": ")
+                            .append(ctx.render(viewer, args[1])), "chat", speaker.getString());
+                }
+            });
+            builder.setTextRenderer(ExTextRenderer::new);
+        });
+    }
+
+    private static class ExTextRenderer extends AbstractTextRenderer {
+        public ExTextRenderer(AbstractDialoguePlayer player, String locale) {
+            super(player, locale);
+        }
+
+        @Override
+        protected void renderTagged(String s, List<String> list, TextPart textPart, StringBuilder stringBuilder) throws DialogueException {
+            for (ChatFormatting chatFormatting : ChatFormatting.values()) {
+                if (chatFormatting.getName().equals(s)) {
+                    stringBuilder.append(chatFormatting);
+                    visit(textPart);
+                    stringBuilder.append(ChatFormatting.RESET);
+                    break;
+                }
+            }
+        }
+
+        @Override
+        protected void renderTag(String s, List<String> list, StringBuilder stringBuilder) {
+            for (ChatFormatting chatFormatting : ChatFormatting.values()) {
+                if (chatFormatting.getName().equals(s)) {
+                    stringBuilder.append(chatFormatting);
+                    break;
+                }
+            }
+        }
     }
 
     private static class TestItem extends Item {

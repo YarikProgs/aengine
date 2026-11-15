@@ -1,5 +1,7 @@
 package net.aros.engine.client;
 
+import net.aros.engine.client.dialogue.ClientDialogues;
+import net.aros.engine.client.dialogue.PhraseRenderers;
 import net.aros.engine.client.init.AeKeybinds;
 import net.aros.engine.client.init.AeUIs;
 import net.aros.engine.client.init.AeValuesUIProviders;
@@ -7,6 +9,9 @@ import net.aros.engine.client.script.events.ClientEventSubscriptions;
 import net.aros.engine.client.script.procedures.ClientProcedureDecoding;
 import net.aros.engine.client.script.procedures.ClientProcedures;
 import net.aros.engine.common.ArosEngine;
+import net.aros.engine.common.network.s2c.DisplayPhrasePayload;
+import net.aros.engine.common.network.s2c.StartDialoguePayload;
+import net.aros.engine.common.network.s2c.EndDialoguePayload;
 import net.aros.engine.common.network.s2c.ProcedureCallPayload;
 import net.aros.engine.common.script.ScriptReloadListener;
 import net.aros.engine.common.script.procedure.ProcedureSerializationException;
@@ -20,6 +25,8 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Set;
@@ -32,6 +39,7 @@ public final class ArosEngineClient {
         AeKeybinds.init();
         AeValuesUIProviders.init();
         AeUIs.init();
+        NeoForge.EVENT_BUS.addListener(ClientPlayerNetworkEvent.LoggingOut.class, e -> ClientDialogues.clear());
 
         bus.addListener(RegisterClientReloadListenersEvent.class, e -> e.registerReloadListener(new ScriptReloadListener(
                 () -> {
@@ -42,6 +50,8 @@ public final class ArosEngineClient {
         if (ArosEngine.CONFIG.debug.examplesEnabled()) {
             new ArosEngineClientExamples(bus);
         }
+
+        PhraseRenderers.reload(); // will replace with dynamic reload if needed
     }
 
     private Predicate<Resource> createScriptValidator() {
@@ -64,5 +74,17 @@ public final class ArosEngineClient {
             ClientProcedures.call(payload.id(), args);
         } catch (ProcedureSerializationException ignore) {
         }
+    }
+
+    public static void handleDisplayPhrase(DisplayPhrasePayload<?, ?> payload, IPayloadContext ctx) {
+        ClientDialogues.handle(payload);
+    }
+
+    public static void handleStartDialogue(StartDialoguePayload payload, IPayloadContext ctx) {
+        ClientDialogues.handle(payload);
+    }
+
+    public static void handleEndDialogue(EndDialoguePayload payload, IPayloadContext ctx) {
+        ClientDialogues.handle(payload);
     }
 }
